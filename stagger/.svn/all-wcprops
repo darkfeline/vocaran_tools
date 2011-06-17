@@ -1,0 +1,71 @@
+K 25
+svn:wc:ra_dav:version-url
+V 31
+/svn/!svn/ver/103/trunk/stagger
+END
+errors.py
+K 25
+svn:wc:ra_dav:version-url
+V 40
+/svn/!svn/ver/88/trunk/stagger/errors.py
+END
+fileutil.py
+K 25
+svn:wc:ra_dav:version-url
+V 42
+/svn/!svn/ver/88/trunk/stagger/fileutil.py
+END
+util.py
+K 25
+svn:wc:ra_dav:version-url
+V 38
+/svn/!svn/ver/88/trunk/stagger/util.py
+END
+specs.py
+K 25
+svn:wc:ra_dav:version-url
+V 39
+/svn/!svn/ver/97/trunk/stagger/specs.py
+END
+frames.py
+K 25
+svn:wc:ra_dav:version-url
+V 41
+/svn/!svn/ver/101/trunk/stagger/frames.py
+END
+tags.py
+K 25
+svn:wc:ra_dav:version-url
+V 38
+/svn/!svn/ver/99/trunk/stagger/tags.py
+END
+id3.py
+K 25
+svn:wc:ra_dav:version-url
+V 38
+/svn/!svn/ver/100/trunk/stagger/id3.py
+END
+__init__.py
+K 25
+svn:wc:ra_dav:version-url
+V 43
+/svn/!svn/ver/103/trunk/stagger/__init__.py
+END
+conversion.py
+K 25
+svn:wc:ra_dav:version-url
+V 44
+/svn/!svn/ver/88/trunk/stagger/conversion.py
+END
+id3v1.py
+K 25
+svn:wc:ra_dav:version-url
+V 39
+/svn/!svn/ver/88/trunk/stagger/id3v1.py
+END
+commandline.py
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/svn/!svn/ver/102/trunk/stagger/commandline.py
+END
