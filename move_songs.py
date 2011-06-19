@@ -14,15 +14,16 @@ import stagger
 
 ROOT = "/home/darkfeline/Music/VOCALOID"
 _VOCALOIDS = ["初音ミク",
-             ["鏡音リン・レン", "鏡音リン", "鏡音レン"],
+             ["鏡音リン・レン", "鏡音リン", "鏡音レン", "鏡音リンレン"],
              "巡音ルカ",
              "MEIKO",
              "KAITO",
              "GUMI",
-             "Lily"
+             "Lily",
              "VY1",
              "歌愛ユキ", 
-             "猫村いろは"]
+             "猫村いろは",
+             "重音テト"]
 VOCALOIDS = []
 for a in _VOCALOIDS:
     if isinstance(a, list):
@@ -58,6 +59,9 @@ def process(file):
 
     if len(imatch) == 1:
         guess = _VOCALOIDS[imatch[0]]
+        # For synonymous vocaloid names, use first element in list
+        if isinstance(guess, list):
+            guess = guess[0]
     else:
         guess = None
 
@@ -81,6 +85,9 @@ def process(file):
                 print(i + ": Not a valid input: Skipping")
                 return
             guess = _VOCALOIDS[i]
+            # For synonymous vocaloid names, use first element in list
+            if isinstance(guess, list):
+                guess = guess[0]
 
     oldp = os.path.join(os.getcwd(), file)
     newp = os.path.join(ROOT, guess)

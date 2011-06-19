@@ -7,6 +7,7 @@ import re
 import urllib.parse
 import urllib.request
 import urllib.error
+import http.cookiejar
 
 def srcparse(source):
     """Returns a dict listing of song ranks and NND IDs.
@@ -37,17 +38,18 @@ string containing the NND ID (e.g. sm123456789 or nm123456789) of that song.
                         switch = 2
                     a = 'h' + a
                 links[a] = match.group(2)
+                continue
             elif switch == 0:
                 # if the line is not a song, check to see if the history
                 # section is starting
                 match = wvrhis.search(line)
                 if match:
                     switch = 1
-            else:
-                # check for ed song match
-                match = wvred.search(line)
-                if match:
-                    links['ed'] = match.group(1)
+                    continue
+            # check for ed song match
+            match = wvred.search(line)
+            if match:
+                links['ed'] = match.group(1)
     return links
 
 def lsparse(list, links, sep='::'):
@@ -88,8 +90,8 @@ list is the name of a file with the following syntax:
                 match = idm.search(line)
                 if match:
                     id = match.group(1).lower()
-            fields.append((id, match.group(2), match.group(3), match.group(4),
-                           match.group(5), match.group(6))[:len(c) + 1])
+            fields.append([id, match.group(2), match.group(3), match.group(4),
+                           match.group(5), match.group(6)][:len(c) + 1])
     return fields
 
 def dl(file, id, title, artist, album='', comment='', apic='def'):
@@ -114,6 +116,7 @@ either stick with 'def' or 'none'.
         conn = urllib.request.urlopen(
             'http://media1.nicomimi.net/customplay.rb', params)
     except urllib.error.HTTPError:
+        print('-' * 60)
         print('Failed for ' + file)
         print('id: ' + id)
         print('title: ' + title)
@@ -126,10 +129,26 @@ either stick with 'def' or 'none'.
     with open(file, 'wb') as f:
         f.write(data)
     conn.close()
+    print('Finished ' + file)
+
+def dl2(file, id):
+    cj = http.cookiejar.CookieJar()
+    opener = urllib.request.build_opener(
+        urllib.request.HTTPCookieProcessor(cj))
+    conn = opener.open('http://nicosound.anyap.info/sound/' + id)
+    conn.close()
+    conn = opener.open(
+        'http://nicosound.anyap.info/redirect/sound.aspx?v=' + id + '&fmt=mp3')
+    data = conn.read()
+    with open(file, 'wb') as f:
+        f.write(data)
+    conn.close()
 
 def dlloop(fields):
+    """fields returned from lsparse."""
     a = re.compile(r'/')
     for x in fields:
+        print('debug:' + str(x))
         name = x[1] + '.mp3'
         name = a.sub('|', name)
         dl(name, *x)
@@ -145,6 +164,6 @@ if __name__ == '__main__':
     for x in fields:
         if len(x) < 5:
             for i in range(4 - len(x)):
-                x += ('',)
-            x += (x[0],)
+                x.append('')
+            x.append(x[0])
     dlloop(fields)
