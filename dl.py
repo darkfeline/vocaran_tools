@@ -7,7 +7,6 @@ import re
 import urllib.parse
 import urllib.request
 import urllib.error
-import http.cookiejar
 
 def srcparse(source):
     """Returns a dict listing of song ranks and NND IDs.
@@ -131,24 +130,10 @@ either stick with 'def' or 'none'.
     conn.close()
     print('Finished ' + file)
 
-def dl2(file, id):
-    cj = http.cookiejar.CookieJar()
-    opener = urllib.request.build_opener(
-        urllib.request.HTTPCookieProcessor(cj))
-    conn = opener.open('http://nicosound.anyap.info/sound/' + id)
-    conn.close()
-    conn = opener.open(
-        'http://nicosound.anyap.info/redirect/sound.aspx?v=' + id + '&fmt=mp3')
-    data = conn.read()
-    with open(file, 'wb') as f:
-        f.write(data)
-    conn.close()
-
 def dlloop(fields):
     """fields returned from lsparse."""
     a = re.compile(r'/')
     for x in fields:
-        print('debug:' + str(x))
         name = x[1] + '.mp3'
         name = a.sub('|', name)
         dl(name, *x)
