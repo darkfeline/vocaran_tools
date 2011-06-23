@@ -38,28 +38,24 @@ In Firefox:
 3) Right-click > View Selection Source
 4) Copy all of the source and paste into src.txt
 
-In list.txt, put the songs and information, one song per line, like this:
+In list.txt, put the songs and information, one song per line, like this::
 
-::
+    id::song_name::artist::album
 
-id::song_name::artist::album
+Examples::
 
-Examples:
-
-::
-
-29
-29::クルーキッド::
-29::クルーキッド::ヤオギ feat. 初音ミク
-29::クルーキッド::ヤオギ feat. 初音ミク::Vocaran song
+    29
+    29::クルーキッド::
+    29::クルーキッド::ヤオギ feat. 初音ミク
+    29::クルーキッド::ヤオギ feat. 初音ミク::Vocaran song
 
 Only the id is necessary.
 
 ::
 
-sm14258485::モノクロナイト::あーるP feat. 初音ミクsweet&dark
-h3::さよならメモリーズ::Ciel feat. GUMI
-ed::METROPOLIS CRISIS::MEIKO
+    sm14258485::モノクロナイト::あーるP feat. 初音ミクsweet&dark
+    h3::さよならメモリーズ::Ciel feat. GUMI
+    ed::METROPOLIS CRISIS::MEIKO
 
 You can use NND id (e.g., sm12345679), rank number, history rank number (e.g., h1, h2), or ed
 
@@ -91,11 +87,9 @@ Vocaran ranking page.  An empty file can be substituted instead of translation
 of rank numbers is not needed.
 
 list is a file containing the songs to download and relevant information, one
-per line in the following format:
+per line in the following format::
 
-::
-
-id::song_name::artist::album::comment::albumart
+    id::song_name::artist::album::comment::albumart
 
 - id can either be the NND id of the song, the rank number of the song, the
   rank number preceeded by an 'h' to denote a song in the history section of
