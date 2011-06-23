@@ -38,11 +38,15 @@ In Firefox:
 3) Right-click > View Selection Source
 4) Copy all of the source and paste into src.txt
 
-In list.txt, put the songs and information, one song per line, like this::
+In list.txt, put the songs and information, one song per line, like this:
+
+::
 
 id::song_name::artist::album
 
-Examples::
+Examples:
+
+::
 
 29
 29::クルーキッド::
@@ -87,7 +91,9 @@ Vocaran ranking page.  An empty file can be substituted instead of translation
 of rank numbers is not needed.
 
 list is a file containing the songs to download and relevant information, one
-per line in the following format::
+per line in the following format:
+
+::
 
 id::song_name::artist::album::comment::albumart
 
