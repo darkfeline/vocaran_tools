@@ -1,97 +1,16 @@
 #!/usr/bin/env python3
 
-# Distributed under GPLv3.  The full license can be found here:
-# http://www.gnu.org/licenses/gpl.html
-
+import os
 import re
 import urllib.parse
 import urllib.request
 import urllib.error
+import http.cookiejar
 
-def srcparse(source):
-    """Returns a dict listing of song ranks and NND IDs.
-    
-The source should be the path to a file containing the html source of
-the ranking section on the relevant Vocaloidism page.  srcparse scanes the
-source and returns a dict where the key is a string which contains the rank
-number of a song, with or without an 'h' prepended (the 'h' is present for
-songs in the history section) or 'ed'.  The items each key refers to is a
-string containing the NND ID (e.g. sm123456789 or nm123456789) of that song.
+import stagger
+from stagger.id3 import *
 
-"""
-    wvr = re.compile(r'#([0-9]+).*?www\.nicovideo\.jp/watch/([sn]m[0-9]+)', re.I)
-    wvrhis = re.compile('THIS WEEK IN HISTORY', re.I)
-    wvred = re.compile(r'ED Song.*?www\.nicovideo\.jp/watch/([sn]m[0-9]+)', re.I)
-    links = {}
-    switch = 0
-    with open(source) as src:
-        for line in src:
-            # first scan line for song
-            match = wvr.search(line)
-            if match:
-                a = match.group(1)
-                if switch == 1:
-                    # line is in history section, prepend number with 'h'.  If
-                    # it's the last song (#1), go back to regular ranking
-                    if a == "1":
-                        switch = 2
-                    a = 'h' + a
-                links[a] = match.group(2)
-                continue
-            elif switch == 0:
-                # if the line is not a song, check to see if the history
-                # section is starting
-                match = wvrhis.search(line)
-                if match:
-                    switch = 1
-                    continue
-            # check for ed song match
-            match = wvred.search(line)
-            if match:
-                links['ed'] = match.group(1)
-    return links
-
-def lsparse(list, links, sep='::'):
-    """Returns a list with all args needed to dl custom mp3 from nicomimi.
-    
-[
-    [id, song_name, artist, album, comment, albumart],
-    .
-    .
-    .
-]
-
-list is the name of a file with the following syntax: 
-    Each line has 6 fields, separated with the string given to lsparse.  The
-    first field is either one of the keys in links generated from srcparse
-    (i.e. rank number, with or without an 'h' prepended or 'ed') or a raw NND
-    ID.  The rest of the fields are song name, artist, album, comment,
-    albumart.
-    e.g. rank_no|id::song_name::artist::album::comment::albumart
-
-"""
-    # regex magic follows
-    sepm = r'(?:{})'.format(sep)
-    tail = sepm.join(r'(.*?)' for x in range(5))
-    rank = re.compile(r'^(h?[0-9]+|ed)' + sepm + tail, re.I)
-    idm = re.compile(r'^([sn]m[0-9]+)' + sepm + tail, re.I)
-    s = re.compile(sep)
-
-    fields = []
-    with open(list) as src:
-        for line in src:
-            c = s.findall(line)
-            line = line.rstrip() + sep * (5 - len(c))
-            match = rank.search(line)
-            if match:
-                id = links[match.group(1).lower()]
-            else:
-                match = idm.search(line)
-                if match:
-                    id = match.group(1).lower()
-            fields.append([id, match.group(2), match.group(3), match.group(4),
-                           match.group(5), match.group(6)][:len(c) + 1])
-    return fields
+import parse
 
 def dl(file, id, title, artist, album='', comment='', apic='def'):
     """Requests custom .mp3 from nicomimi.net
@@ -111,24 +30,112 @@ either stick with 'def' or 'none'.
                                      'TALB' : album,
                                      'USLT' : comment})
     params = params.encode('utf-8')
-    try:
-        conn = urllib.request.urlopen(
-            'http://media1.nicomimi.net/customplay.rb', params)
-    except urllib.error.HTTPError:
-        print('-' * 60)
-        print('Failed for ' + file)
-        print('id: ' + id)
-        print('title: ' + title)
-        print('artist: ' + artist)
-        print('album: ' + album)
-        print('comment: ' + comment)
-        print('apic: ' + apic)
-        return
+
+    #conn = None
+    #for i in range(1, 6):
+    #    try:
+    #        conn = urllib.request.urlopen(
+    #            'http://media{}.nicomimi.net/customplay.rb'.format(i), params)
+    #        break
+    #    except urllib.error.URLError:
+    #        continue
+    #    except Exception as err:
+    #        print('-' * 60)
+    #        print(err)
+    #        print('Failed for ' + file)
+    #        print('id: ' + id)
+    #        print('title: ' + title)
+    #        print('artist: ' + artist)
+    #        print('album: ' + album)
+    #        print('comment: ' + comment)
+    #        print('apic: ' + apic)
+    #        return
+    #if not conn:
+    #    raise Exception('100', 'all server timeout/unavailable')
+
+    conn = urllib.request.urlopen(
+        'http://media3.nicomimi.net/customplay.rb', params)
+
     data = conn.read()
     with open(file, 'wb') as f:
         f.write(data)
     conn.close()
     print('Finished ' + file)
+
+def altdl(file, id, title, artist, album='', comment='', apic='def'):
+    """Alternate download from nicomimi.net, tagging with stagger"""
+    cj = http.cookiejar.CookieJar()
+    opener = urllib.request.build_opener(
+        urllib.request.HTTPCookieProcessor(cj))
+    conn = opener.open('http://www.nicomimi.net/play/{}'.format(id))
+    conn.close()
+
+    conn = opener.open('http://media2.nicomimi.net/get?vid={}'.format(id)) 
+    data = conn.read()
+    with open(file, 'wb') as f:
+        f.write(data)
+    conn.close()
+
+    tag(file, id, title, artist, album, comment, apic)
+
+    print('Finished ' + file)
+
+# unfinished
+def dl2(file, id, title, artist, album='', comment='', apic='def'):
+    """From nicosound"""
+    conn = urllib.request.urlopen(
+        "http://nicosound.anyap.info/sound/{}".format(id))
+    html = conn.read()
+    conn.close()
+
+    params = urllib.parse.urlencode({'__EVENTTARGET' : eventtarget,
+                                     '__EVENTARGUMENT' : eventargument,
+                                     '__VIEWSTATE' : viewstate,
+                                     '__EVENTVALIDATION' : eventvalidation
+                                    })
+    params = params.encode('utf-8')
+
+    conn = urllib.request.urlopen(
+        "http://nicosound.anyap.info/sound/{}".format(id), params)
+
+    data = conn.read()
+    with open(file, 'wb') as f:
+        f.write(data)
+    conn.close()
+    print('Finished ' + file)
+
+def tag(file, id, title, artist, album='', comment='', apic='def'):
+    """Tags mp3 like nicomimi.  NOTE: comment is tagged as COMM"""
+    # get pic
+    getpic(file + '.jpg', id, apic)
+
+    t = stagger.default_tag()
+    t._filename = file
+    t[TIT2] = title
+    t[TPE1] = artist
+    t[TALB] = album
+    t[USLT] = USLT(text=comment)
+    t[APIC] = APIC(file + '.jpg')
+    t.write()
+
+    # remove pic
+    os.remove(file + '.jpg')
+
+def getpic(file, id, apic='def'):
+    """Gets art from nicomimi.net servers and saves to file"""
+    param = ''
+    try:
+        if int(apic) > 0:
+            param = '?aw=' + int(apic)
+    except ValueError:
+        pass
+
+    conn = urllib.request.urlopen(
+        'http://www.nicomimi.net/thumbnail/{}{}'.format(id, param))
+    data = conn.read()
+    with open(file, 'wb') as f:
+        f.write(data)
+    conn.close()
 
 def dlloop(fields):
     """fields returned from lsparse."""
@@ -136,15 +143,11 @@ def dlloop(fields):
     for x in fields:
         name = x[1] + '.mp3'
         name = a.sub('|', name)
-        dl(name, *x)
+        #dl(name, *x)
+        altdl(name, *x)
 
-if __name__ == '__main__':
-    import sys
-    
-    src = sys.argv[1]
-    list = sys.argv[2]
-    links = srcparse(src)
-    fields = lsparse(list, links)
+def main(list):
+    fields = parse.parse(list)
     # set comment field to id
     for x in fields:
         if len(x) < 5:
@@ -152,3 +155,9 @@ if __name__ == '__main__':
                 x.append('')
             x.append(x[0])
     dlloop(fields)
+
+if __name__ == '__main__':
+    import sys
+
+    list = sys.argv[1]
+    main(list)

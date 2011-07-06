@@ -23,7 +23,9 @@ _VOCALOIDS = ["初音ミク",
              "VY1",
              "歌愛ユキ", 
              "猫村いろは",
-             "重音テト"]
+             "重音テト",
+             "空音ラナ",
+             ["開発コード miki", "開発コードmiki", "miki"]]
 VOCALOIDS = []
 for a in _VOCALOIDS:
     if isinstance(a, list):
@@ -76,9 +78,13 @@ def process(file):
                 n = n[0]
             print(str(i) + " " + n)
         print("r base directory: " + ROOT)
+        print("s skip")
         i = input("destination?")
         if i.lower() == "r":
             guess = ""
+        elif i.lower() == "s":
+            print("Skipping")
+            return
         else:
             i = int(i)
             if not 0 <= i < len(_VOCALOIDS):
@@ -92,7 +98,8 @@ def process(file):
     oldp = os.path.join(os.getcwd(), file)
     newp = os.path.join(ROOT, guess)
 
-    print(oldp + " -> " + newp)
+    print("From: " + oldp)
+    print("To: " + newp)
     i = input("y/n[y]? ").lower()
     if i in ("y", "yes", ""):
         subprocess.call(["mv", oldp, newp])
