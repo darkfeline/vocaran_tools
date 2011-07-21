@@ -20,6 +20,9 @@ apic can be 'none' (no albumart), 'def' (default art), and an arbitrary number
 of string depending on the song, thus: '1', '2', '3'  It's probably better to
 either stick with 'def' or 'none'.
 
+Replaced entirely by altdl(), as that function is superior to this one in
+almost every single way.  This function will be kept for reference.
+
 """
     params = urllib.parse.urlencode({'vid' : id,
                                      'access_key1' : 'hePj8S3ewMayA',
@@ -63,7 +66,14 @@ either stick with 'def' or 'none'.
     print('Finished ' + file)
 
 def altdl(file, id, title, artist, album='', comment='', apic='def'):
-    """Alternate download from nicomimi.net, tagging with stagger"""
+    """Requests .mp3 download from nicomimi.net, then tags file using stagger.
+
+file should probably match name and end in '.mp3' as the right extension.
+apic can be 'none' (no albumart), 'def' (default art), and an arbitrary number
+of string depending on the song, thus: '1', '2', '3'  It's probably better to
+either stick with 'def' or 'none'.
+
+"""
     cj = http.cookiejar.CookieJar()
     opener = urllib.request.build_opener(
         urllib.request.HTTPCookieProcessor(cj))
@@ -83,8 +93,10 @@ def altdl(file, id, title, artist, album='', comment='', apic='def'):
 # unfinished
 def dl2(file, id, title, artist, album='', comment='', apic='def'):
     """From nicosound"""
-    conn = urllib.request.urlopen(
-        "http://nicosound.anyap.info/sound/{}".format(id))
+    cj = http.cookiejar.CookieJar()
+    opener = urllib.request.build_opener(
+        urllib.request.HTTPCookieProcessor(cj))
+    conn = opener.open("http://nicosound.anyap.info/sound/{}".format(id))
     html = conn.read()
     conn.close()
 
@@ -95,17 +107,21 @@ def dl2(file, id, title, artist, album='', comment='', apic='def'):
                                     })
     params = params.encode('utf-8')
 
-    conn = urllib.request.urlopen(
-        "http://nicosound.anyap.info/sound/{}".format(id), params)
+    conn = opener.open("http://nicosound.anyap.info/sound/{}".format(id),
+                       params)
 
     data = conn.read()
     with open(file, 'wb') as f:
         f.write(data)
     conn.close()
+
+    tag(file, id, title, artist, album, comment, apic)
+
     print('Finished ' + file)
 
 def tag(file, id, title, artist, album='', comment='', apic='def'):
-    """Tags mp3 like nicomimi.  NOTE: comment is tagged as COMM"""
+    """Tags mp3 using stagger.  NOTE: comment is tagged as COMM, as opposed to
+USLT that nicomimi.net custom uses for comments/lyrics."""
     # get pic
     getpic(file + '.jpg', id, apic)
 
