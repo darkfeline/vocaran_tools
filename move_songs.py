@@ -14,7 +14,7 @@ import time
 import stagger
 
 ROOT = "/home/darkfeline/Music/VOCALOID"
-_VOCALOIDS = ["初音ミク",
+VOCALOIDS = ["初音ミク",
              ["鏡音リン・レン", "鏡音リン", "鏡音レン", "鏡音リンレン"],
              "巡音ルカ",
              "MEIKO",
@@ -27,15 +27,15 @@ _VOCALOIDS = ["初音ミク",
              "重音テト",
              "空音ラナ",
              ["開発コード miki", "開発コードmiki", "miki"]]
-VOCALOIDS = []
-for a in _VOCALOIDS:
+PVOCALOIDS = []
+for a in VOCALOIDS:
     if isinstance(a, list):
         x = []
         for b in a:
             x.append(re.compile(b))
-        VOCALOIDS.append(x)
+        PVOCALOIDS.append(x)
     else:
-        VOCALOIDS.append(re.compile(a))
+        PVOCALOIDS.append(re.compile(a))
 
 def main():
     """Finds all MP3s in current directory by extension and runs process() on
@@ -52,7 +52,7 @@ def process(file):
     artist = tag.artist
 
     imatch = []
-    for i, p in enumerate(VOCALOIDS):
+    for i, p in enumerate(PVOCALOIDS):
         if isinstance(p, list):
             for q in p:
                 if q.search(artist):
@@ -63,7 +63,7 @@ def process(file):
                 imatch.append(i)
 
     if len(imatch) == 1:
-        guess = _VOCALOIDS[imatch[0]]
+        guess = VOCALOIDS[imatch[0]]
         # For synonymous vocaloid names, use first element in list
         if isinstance(guess, list):
             guess = guess[0]
@@ -76,7 +76,7 @@ def process(file):
     print("Artist: " + artist)
     if not guess:
         print("Couldn't guess directory")
-        for i, n in enumerate(_VOCALOIDS):
+        for i, n in enumerate(VOCALOIDS):
             if isinstance(n, list):
                 n = n[0]
             print(str(i) + " " + n)
@@ -90,10 +90,10 @@ def process(file):
             return
         else:
             i = int(i)
-            if not 0 <= i < len(_VOCALOIDS):
+            if not 0 <= i < len(VOCALOIDS):
                 print(i + ": Not a valid input: Skipping")
                 return
-            guess = _VOCALOIDS[i]
+            guess = VOCALOIDS[i]
             # For synonymous vocaloid names, use first element in list
             if isinstance(guess, list):
                 guess = guess[0]
