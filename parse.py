@@ -86,6 +86,9 @@ list is the name of a file with the following syntax:
                 match = idm.search(line)
                 if match:
                     id = match.group(1).lower()
+            if not match:
+                raise Exception("Error when parsing {file}: {line}".format(
+                    file=list, line=line))
             fields.append([id, match.group(2), match.group(3), match.group(4),
                            match.group(5), match.group(6)][:len(c) + 1])
     return fields

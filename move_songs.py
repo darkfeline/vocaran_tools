@@ -8,7 +8,8 @@
 import os
 import os.path
 import re
-import subprocess
+import shutil
+import time
 
 import stagger
 
@@ -37,6 +38,8 @@ for a in _VOCALOIDS:
         VOCALOIDS.append(re.compile(a))
 
 def main():
+    """Finds all MP3s in current directory by extension and runs process() on
+each."""
     dir = os.listdir(os.getcwd())
     p = re.compile(r".*\.mp3$", re.I)
     dir = [f for f in dir if p.match(f)]
@@ -102,9 +105,44 @@ def process(file):
     print("To: " + newp)
     i = input("y/n[y]? ").lower()
     if i in ("y", "yes", ""):
-        subprocess.call(["mv", oldp, newp])
-        print("Moved")
+        # Deal with if file already exists
+        if os.path.isdir(os.path.join(newp, file)):
+            print("{} is a directory; skipping".format(os.path.join(newp, file)))
+        elif os.path.isfile(os.path.join(newp, file)):
+            print("{} exists. Replace?".format(os.path.join(newp, file)))
+
+            tag = stagger.read_tag(os.path.join(newp, file))
+            title = tag.title
+            artist = tag.artist
+            mtime = time.strftime("%a, %d %b %Y %H:%M:%S +0000",
+                      time.gmtime(os.path.getmtime(os.path.join(newp, file))))
+            print("""Old: 
+Title:{title} 
+Artist:{artist} 
+mtime:{mtime}""".format(title=title, artist=artist, mtime=mtime))
+
+            tag = stagger.read_tag(oldp)
+            title = tag.title
+            artist = tag.artist
+            mtime = time.strftime("%a, %d %b %Y %H:%M:%S +0000",
+                      time.gmtime(os.path.getmtime(os.path.join(newp, file))))
+            print("""New: 
+Title:{title} 
+Artist:{artist} 
+mtime:{mtime}""".format(title=title, artist=artist, mtime=mtime))
+
+            i = input("y/n[y]? ").lower()
+            if i in ("y", "yes", ""):
+                os.rename(oldp, os.path.join(newp, file))
+                print("Overwritten")
+            else:
+                print("Skipping")
+                return
+        else:
+            shutil.move(oldp, newp)
+            print("Moved")
     else:
+        print("Skipping")
         return
 
 if __name__ == '__main__':
