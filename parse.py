@@ -16,9 +16,9 @@ songs in the history section) or 'ed'.  The items each key refers to is a
 string containing the NND ID (e.g. sm123456789 or nm123456789) of that song.
 
 """
-    wvr = re.compile(r'#([0-9]+).*?www\.nicovideo\.jp/watch/([sn]m[0-9]+)', re.I)
+    wvr = re.compile(r'#([0-9]+).*?www\.nicovideo\.jp/watch/([sn][mo][0-9]+)', re.I)
     wvrhis = re.compile('THIS WEEK IN HISTORY', re.I)
-    wvred = re.compile(r'ED Song.*?www\.nicovideo\.jp/watch/([sn]m[0-9]+)', re.I)
+    wvred = re.compile(r'ED Song.*?www\.nicovideo\.jp/watch/([sn][mo][0-9]+)', re.I)
     links = {}
     switch = 0
     with open(source) as src:
@@ -109,26 +109,28 @@ list is the name of a file with the following syntax:
     (i.e. rank number, with or without an 'h' prepended or 'ed') or a raw NND
     ID.  The rest of the fields are song name, artist, album, comment,
     albumart.
-    e.g. rank_no|id::song_name::artist::album::comment::albumart
+    e.g. id::song_name::artist::album::comment::albumart
 
 """
     # regex magic follows
-    sepm = r'(?:{})'.format(SEP)
-    tail = sepm.join(r'(.*?)' for x in range(5))
-    idm = re.compile(r'^([sn]m[0-9]+)' + sepm + tail, re.I)
+    sep = r'(?:{})'.format(SEP)
+    idp = re.compile(sep.join([r'^(?P<id>[sn]m[0-9]+)', r'(?P<title>.*?)',
+                               r'(?P<artist>.*?)', r'(?P<album>.*?)',
+                               r'(?P<comment>.*?)', r'(?P<albumart>.*?)']),
+                     re.I) 
     s = re.compile(SEP)
 
     fields = []
     with open(list) as src:
         for line in src:
-            c = s.findall(line)
+            c = s.findall(line) # number of SEPs in line
             line = line.rstrip() + SEP * (5 - len(c))
 
-            match = idm.search(line)
+            match = idp.search(line)
             if match:
-                id = match.group(1).lower()
-            fields.append([id, match.group(2), match.group(3), match.group(4),
-                           match.group(5), match.group(6)][:len(c) + 1])
+                g = match.group
+                fields.append([g('id'), g('title'), g('artist'), g('album'),
+                               g('comment'), g('albumart')][:len(c) + 1])
     return fields
 
 def main(src, list, out):

@@ -10,8 +10,16 @@ import os.path
 import re
 import shutil
 import time
+import subprocess
 
 import stagger
+
+# check dependencies
+NULL = open(os.devnull, 'w')
+try:
+    subprocess.call(['mp3info'], stdout=NULL)
+except OSError:
+    raise Exception('move_songs.py depends on mp3info')
 
 ROOT = "/home/darkfeline/Music/VOCALOID"
 VOCALOIDS = ["初音ミク",
@@ -114,21 +122,27 @@ def process(file):
             tag = stagger.read_tag(os.path.join(newp, file))
             title = tag.title
             artist = tag.artist
+            length = subprocess.check_output(['mp3info', '-p', '"%m:%s"', 
+                                              os.path.join(newp, file)])
             mtime = time.strftime("%a, %d %b %Y %H:%M:%S +0000",
                       time.gmtime(os.path.getmtime(os.path.join(newp, file))))
             print("""Old: 
 Title:{title} 
 Artist:{artist} 
+Length:{length}
 mtime:{mtime}""".format(title=title, artist=artist, mtime=mtime))
 
             tag = stagger.read_tag(oldp)
             title = tag.title
             artist = tag.artist
+            length = subprocess.check_output(['mp3info', '-p', '"%m:%s"', 
+                                              oldp])
             mtime = time.strftime("%a, %d %b %Y %H:%M:%S +0000",
-                      time.gmtime(os.path.getmtime(os.path.join(newp, file))))
+                      time.gmtime(os.path.getmtime(oldp)))
             print("""New: 
 Title:{title} 
 Artist:{artist} 
+Length:{length}
 mtime:{mtime}""".format(title=title, artist=artist, mtime=mtime))
 
             i = input("y/n[y]? ").lower()

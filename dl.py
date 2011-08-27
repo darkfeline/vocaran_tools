@@ -164,7 +164,7 @@ def dlloop(fields):
 
 def main(list):
     fields = parse.parse(list)
-    # set comment field to id
+    # set comment field to id if it doesn't exist
     for x in fields:
         if len(x) < 5:
             for i in range(4 - len(x)):
