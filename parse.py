@@ -17,7 +17,7 @@ songs in the history section) or 'ed'.  The items each key refers to is a
 string containing the NND ID (e.g. sm123456789 or nm123456789) of that song.
 
 """
-    wvr = re.compile(r'#([0-9]+).*?www\.nicovideo\.jp/watch/' +
+    wvr = re.compile(r'<strong>.*?([0-9]+).*?www\.nicovideo\.jp/watch/' +
                      '({})'.format(NNDID), re.I)
     wvrhis = re.compile('THIS WEEK IN HISTORY', re.I)
     wvred = re.compile(r'ED Song.*?www\.nicovideo\.jp/watch/' +
@@ -84,7 +84,7 @@ list is the name of a file with the following syntax:
             line = line.rstrip() + SEP * (5 - len(c))
             match = rank.search(line)
             if match:
-                id = match.group(1).lower()
+                id = links[match.group(1).lower()]
             else:
                 match = idm.search(line)
                 if match:
