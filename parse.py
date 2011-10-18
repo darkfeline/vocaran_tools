@@ -3,6 +3,7 @@
 import re
 
 SEP = "::"
+NNDID = '[sn][mo][0-9]+'
 
 def srcparse(source):
     """Returns a dict with song rank keys mapped to corresponding NND IDs using
@@ -16,9 +17,11 @@ songs in the history section) or 'ed'.  The items each key refers to is a
 string containing the NND ID (e.g. sm123456789 or nm123456789) of that song.
 
 """
-    wvr = re.compile(r'#([0-9]+).*?www\.nicovideo\.jp/watch/([sn][mo][0-9]+)', re.I)
+    wvr = re.compile(r'#([0-9]+).*?www\.nicovideo\.jp/watch/' +
+                     '({})'.format(NNDID), re.I)
     wvrhis = re.compile('THIS WEEK IN HISTORY', re.I)
-    wvred = re.compile(r'ED Song.*?www\.nicovideo\.jp/watch/([sn][mo][0-9]+)', re.I)
+    wvred = re.compile(r'ED Song.*?www\.nicovideo\.jp/watch/' +
+                       '({})'.format(NNDID), re.I)
     links = {}
     switch = 0
     with open(source) as src:
@@ -71,7 +74,7 @@ list is the name of a file with the following syntax:
     sepm = r'(?:{})'.format(SEP)
     tail = sepm.join(r'(.*?)' for x in range(5))
     rank = re.compile(r'^(h?[0-9]+|ed)' + sepm + tail, re.I)
-    idm = re.compile(r'^([sn]m[0-9]+)' + sepm + tail, re.I)
+    idm = re.compile(r'^({})'.format(NNDID) + sepm + tail, re.I)
     s = re.compile(SEP)
 
     fields = []
@@ -81,7 +84,7 @@ list is the name of a file with the following syntax:
             line = line.rstrip() + SEP * (5 - len(c))
             match = rank.search(line)
             if match:
-                id = links[match.group(1).lower()]
+                id = match.group(1).lower()
             else:
                 match = idm.search(line)
                 if match:
@@ -114,7 +117,7 @@ list is the name of a file with the following syntax:
 """
     # regex magic follows
     sep = r'(?:{})'.format(SEP)
-    idp = re.compile(sep.join([r'^(?P<id>[sn]m[0-9]+)', r'(?P<title>.*?)',
+    idp = re.compile(sep.join([r'^(?P<id>{})'.format(NNDID), r'(?P<title>.*?)',
                                r'(?P<artist>.*?)', r'(?P<album>.*?)',
                                r'(?P<comment>.*?)', r'(?P<albumart>.*?)']),
                      re.I) 

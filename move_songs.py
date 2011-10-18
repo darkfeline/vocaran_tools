@@ -30,11 +30,14 @@ VOCALOIDS = ["初音ミク",
              "GUMI",
              "Lily",
              "VY1",
+             "VY2",
              "歌愛ユキ", 
              "猫村いろは",
              "重音テト",
              "空音ラナ",
-             ["開発コード miki", "開発コードmiki", "miki"]]
+             ["開発コード miki", "開発コードmiki", "miki"],
+             ["神威がくぽ", "がくぽ"]
+            ]
 PVOCALOIDS = []
 for a in VOCALOIDS:
     if isinstance(a, list):
@@ -114,6 +117,7 @@ def process(file):
     i = input("y/n[y]? ").lower()
     if i in ("y", "yes", ""):
         # Deal with if file already exists
+        print()
         if os.path.isdir(os.path.join(newp, file)):
             print("{} is a directory; skipping".format(os.path.join(newp, file)))
         elif os.path.isfile(os.path.join(newp, file)):
@@ -122,28 +126,34 @@ def process(file):
             tag = stagger.read_tag(os.path.join(newp, file))
             title = tag.title
             artist = tag.artist
-            length = subprocess.check_output(['mp3info', '-p', '"%m:%s"', 
-                                              os.path.join(newp, file)])
+            length = int(subprocess.check_output(['mp3info', '-p', '%S',
+                                                  os.path.join(newp, file)]))
+            length = '{:02}:{:02}:{:02}'.format(
+                length // 3600, length % 3600 // 60, length % 3600 % 60)
+            length = length.lstrip('0:')
             mtime = time.strftime("%a, %d %b %Y %H:%M:%S +0000",
                       time.gmtime(os.path.getmtime(os.path.join(newp, file))))
             print("""Old: 
 Title:{title} 
 Artist:{artist} 
 Length:{length}
-mtime:{mtime}""".format(title=title, artist=artist, mtime=mtime))
+mtime:{mtime}""".format(title=title, artist=artist, length=length, mtime=mtime))
 
             tag = stagger.read_tag(oldp)
             title = tag.title
             artist = tag.artist
-            length = subprocess.check_output(['mp3info', '-p', '"%m:%s"', 
-                                              oldp])
+            length = int(subprocess.check_output(['mp3info', '-p', '%S',
+                                                  oldp]))
+            length = '{:02}:{:02}:{:02}'.format(
+                length // 3600, length % 3600 // 60, length % 3600 % 60)
+            length = length.lstrip('0:')
             mtime = time.strftime("%a, %d %b %Y %H:%M:%S +0000",
                       time.gmtime(os.path.getmtime(oldp)))
             print("""New: 
 Title:{title} 
 Artist:{artist} 
 Length:{length}
-mtime:{mtime}""".format(title=title, artist=artist, mtime=mtime))
+mtime:{mtime}""".format(title=title, artist=artist, length=length, mtime=mtime))
 
             i = input("y/n[y]? ").lower()
             if i in ("y", "yes", ""):

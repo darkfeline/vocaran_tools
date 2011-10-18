@@ -154,7 +154,8 @@ def getpic(file, id, apic='def'):
     conn.close()
 
 def dlloop(fields):
-    """fields returned from lsparse."""
+    """fields returned from lsparse. loops a dl function over the fields.  file
+name illegal char handling is here"""
     a = re.compile(r'/')
     for x in fields:
         name = x[1] + '.mp3'
@@ -163,6 +164,8 @@ def dlloop(fields):
         altdl(name, *x)
 
 def main(list):
+    """main function.  Parses file, adds empty fields, then passes on to
+dlloop"""
     fields = parse.parse(list)
     # set comment field to id if it doesn't exist
     for x in fields:
