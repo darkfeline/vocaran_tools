@@ -58,6 +58,16 @@ each."""
         process(f)
 
 def process(file):
+    # check file size for zero length files
+    if os.path.getsize(file) < 500:
+        print('File size is ' + os.path.getsize(file) + ' bytes. Skip? [y]/n ')
+        i = input()
+        if i.lower() in ['y', 'yes', '']:
+            print('Skipping')
+            return
+        else:
+            print('Continuing ({} may be corrupt)'.format(file)
+
     tag = stagger.read_tag(file)
     title = tag.title
     artist = tag.artist
@@ -114,7 +124,7 @@ def process(file):
 
     print("From: " + oldp)
     print("To: " + newp)
-    i = input("y/n[y]? ").lower()
+    i = input("[y]/n? ").lower()
     if i in ("y", "yes", ""):
         # Deal with if file already exists
         print()
@@ -155,7 +165,7 @@ Artist:{artist}
 Length:{length}
 mtime:{mtime}""".format(title=title, artist=artist, length=length, mtime=mtime))
 
-            i = input("y/n[y]? ").lower()
+            i = input("[y]/n? ").lower()
             if i in ("y", "yes", ""):
                 os.rename(oldp, os.path.join(newp, file))
                 print("Overwritten")
