@@ -27,9 +27,10 @@ string containing the NND ID (e.g. sm123456789 or nm123456789) of that song.
     with open(source) as src:
         for line in src:
             # first scan line for song
-            match = wvr.search(line)
-            if match:
+            if wvr.search(line):
+                match = wvr.search(line)
                 a = match.group(1)
+                # history
                 if switch == 1:
                     # line is in history section, prepend number with 'h'.  If
                     # it's the last song (#1), go back to regular ranking
@@ -37,17 +38,16 @@ string containing the NND ID (e.g. sm123456789 or nm123456789) of that song.
                         switch = 2
                     a = 'h' + a
                 links[a] = match.group(2)
-                continue
+            # check for history
             elif switch == 0:
                 # if the line is not a song, check to see if the history
                 # section is starting
                 match = wvrhis.search(line)
                 if match:
                     switch = 1
-                    continue
             # check for ed song match
-            match = wvred.search(line)
-            if match:
+            elif wvred.search(line):
+                match = wvred.search(line)
                 links['ed'] = match.group(1)
     return links
 
