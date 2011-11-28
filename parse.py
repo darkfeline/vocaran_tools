@@ -62,12 +62,14 @@ def lsparse(list, links):
 ]
 
 list is the name of a file with the following syntax: 
-    Each line has 6 fields, separated with the globally defined string SEP.  The
-    first field is either one of the keys in links generated from srcparse
+    Each line has 6 fields, separated with the globally defined string SEP.
+    The first field is either one of the keys in links generated from srcparse
     (i.e. rank number, with or without an 'h' prepended or 'ed') or a raw NND
     ID.  The rest of the fields are song name, artist, album, comment,
     albumart.
     e.g. rank_no|id::song_name::artist::album::comment::albumart
+
+links is the return list from srcparse()
 
 """
     # regex magic follows
