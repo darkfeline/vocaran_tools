@@ -30,13 +30,13 @@ extract stagger into the vocaran_tools folder.
 How to use
 ----------
 
-dl.py
-*****
+dl.bat
+******
 
-Make two files in the vocaran_tools folder: src.txt and list.txt.  Be careful
-with the file extensions: Windows may hide them from you.  If it just says src,
-but it's a Text Document File or something similar, then the .txt extension is
-hidden.  
+Make three files in the vocaran_tools folder: src.txt, rank.txt and list.txt.
+Be careful with the file extensions: Windows may hide them from you.  If it
+just says src, but it's a Text Document File or something similar, then the
+.txt extension is hidden.  
 
 In src.txt, put the HTML source code from Vocaloidism:
 
