@@ -6,6 +6,7 @@ import urllib.parse
 import urllib.request
 import urllib.error
 import http.cookiejar
+import subprocess
 
 import stagger
 from stagger.id3 import *
@@ -20,7 +21,7 @@ apic can be 'none' (no albumart), 'def' (default art), and an arbitrary number
 of string depending on the song, thus: '1', '2', '3'  It's probably better to
 either stick with 'def' or 'none'.
 
-Replaced entirely by altdl(), as that function is superior to this one in
+Replaced entirely by dl2(), as that function is superior to this one in
 almost every single way.  This function will be kept for reference.
 
 """
@@ -65,7 +66,7 @@ almost every single way.  This function will be kept for reference.
     conn.close()
     print('Finished ' + file)
 
-def altdl(file, id, title, artist, album='', comment='', apic='def'):
+def dl2(file, id, title, artist, album='', comment='', apic='def'):
     """Requests .mp3 download from nicomimi.net, then tags file using stagger.
 
 file should probably match name and end in '.mp3' as the right extension.
@@ -90,9 +91,9 @@ either stick with 'def' or 'none'.
 
     print('Finished ' + file)
 
-# unfinished
-def dl2(file, id, title, artist, album='', comment='', apic='def'):
-    """From nicosound"""
+# TODO doesn't work yet 
+def dl3(file, id, title, artist, album='', comment='', apic='def'):
+    """dl from nicosound, tagged with tag() (stagger)"""
     cj = http.cookiejar.CookieJar()
     opener = urllib.request.build_opener(
         urllib.request.HTTPCookieProcessor(cj))
@@ -117,6 +118,22 @@ def dl2(file, id, title, artist, album='', comment='', apic='def'):
 
     tag(file, id, title, artist, album, comment, apic)
 
+    print('Finished ' + file)
+
+# TODO not tested yet
+def dl4(file, id, title, artist, album='', comment='', apic='def'):
+    """Requests .mp3 download from nicomimi.net using wget and subprocess, then
+tags file using stagger.
+
+file should probably match name and end in '.mp3' as the right extension.
+apic can be 'none' (no albumart), 'def' (default art), and an arbitrary number
+of string depending on the song, thus: '1', '2', '3'  It's probably better to
+either stick with 'def' or 'none'.
+
+"""
+    subprocess.call(['wget', 
+                     'http://media2.nicomimi.net/get?vid={}'.format(id)])
+    tag(file, id, title, artist, album, comment, apic)
     print('Finished ' + file)
 
 def tag(file, id, title, artist, album='', comment='', apic='def'):
@@ -153,15 +170,17 @@ def getpic(file, id, apic='def'):
         f.write(data)
     conn.close()
 
-def dlloop(fields):
-    """fields returned from lsparse. loops a dl function over the fields.  file
-name illegal char handling is here"""
+def dlloop(dlf, fields):
+    """Loops a dl function over fields.  file name illegal char handling is
+here ('/' replaced with '|')
+    
+fields as returned from lsparse.  
+dlf is the dl function to use."""
     a = re.compile(r'/')
     for x in fields:
         name = x[1] + '.mp3'
         name = a.sub('|', name)
-        #dl(name, *x)
-        altdl(name, *x)
+        dlf(name, *x)
 
 def main(list):
     """main function.  Parses file, adds empty fields, then passes on to
@@ -173,7 +192,7 @@ dlloop"""
             for i in range(4 - len(x)):
                 x.append('')
             x.append(x[0])
-    dlloop(fields)
+    dlloop(dl2, fields)
 
 if __name__ == '__main__':
     import sys
