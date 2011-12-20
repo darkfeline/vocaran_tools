@@ -36,7 +36,8 @@ VOCALOIDS = ["初音ミク",
              "重音テト",
              "空音ラナ",
              ["開発コード miki", "開発コードmiki", "miki"],
-             ["神威がくぽ", "がくぽ"]
+             ["神威がくぽ", "がくぽ"],
+             "氷山キヨテル"
             ]
 PVOCALOIDS = []
 for a in VOCALOIDS:
