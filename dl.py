@@ -179,7 +179,7 @@ dlf is the dl function to use."""
         name = a.sub('|', name)
         print("Fetching {}".format(name))
         dlf(name, *x)
-        print("Finished {} ({}/{})".format(name, i + 1, length(fields)))
+        print("Finished {} ({}/{})".format(name, i + 1, len(fields)))
 
 def main(lst):
     """main function.  Parses file, adds empty fields, then passes on to
