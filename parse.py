@@ -20,7 +20,7 @@ string containing the NND ID (e.g. sm123456789 or nm123456789) of that song.
     wvr = re.compile(r'<strong>.*?([0-9]+).*?www\.nicovideo\.jp/watch/' +
                      '({})'.format(NNDID), re.I)
     wvrhis = re.compile('THIS WEEK IN HISTORY', re.I)
-    wvrpkp = re.compile(r'<strong>.*?Pick-Up.*?www\.nicovideo\.jp/watch/' +
+    wvrpkp = re.compile(r'<strong>.*Pick-Up.*?www\.nicovideo\.jp/watch/' +
                         '({})'.format(NNDID), re.I)
     wvred = re.compile(r'ED Song.*?www\.nicovideo\.jp/watch/' +
                        '({})'.format(NNDID), re.I)
@@ -40,6 +40,14 @@ string containing the NND ID (e.g. sm123456789 or nm123456789) of that song.
                         switch = 2
                     a = 'h' + a
                 links[a] = match.group(2)
+            # check for pickup song match
+            elif wvrpkp.search(line):
+                match = wvrpkp.search(line)
+                links['pkp'] = match.group(1)
+            # check for ed song match
+            elif wvred.search(line):
+                match = wvred.search(line)
+                links['ed'] = match.group(1)
             # check for history
             elif switch == 0:
                 # if the line is not a song, check to see if the history
@@ -47,17 +55,9 @@ string containing the NND ID (e.g. sm123456789 or nm123456789) of that song.
                 match = wvrhis.search(line)
                 if match:
                     switch = 1
-            # check for pickup song match
-            elif wvrpkp.search(line):
-                match = wvred.search(line)
-                links['pkp'] = match.group(1)
-            # check for ed song match
-            elif wvred.search(line):
-                match = wvred.search(line)
-                links['ed'] = match.group(1)
     return links
 
-def lsparse(list, links):
+def lsparse(lst, links):
     """Returns a list with all args needed to dl custom mp3 from nicomimi.
     
 [
@@ -67,7 +67,7 @@ def lsparse(list, links):
     .
 ]
 
-list is the name of a file with the following syntax: 
+lst is the name of a file with the following syntax: 
     Each line has 6 fields, separated with the globally defined string SEP.
     The first field is either one of the keys in links generated from srcparse
     (i.e. rank number, with or without an 'h' prepended, 'pkp' or 'ed') or a
@@ -86,7 +86,7 @@ links is the return list from srcparse()
     s = re.compile(SEP)
 
     fields = []
-    with open(list) as src:
+    with open(lst) as src:
         for line in src:
             c = s.findall(line)
             line = line.rstrip() + SEP * (5 - len(c))
@@ -99,12 +99,12 @@ links is the return list from srcparse()
                     id = match.group(1).lower()
             if not match:
                 raise Exception("Error when parsing {file}: {line}".format(
-                    file=list, line=line))
+                    file=lst, line=line))
             fields.append([id, match.group(2), match.group(3), match.group(4),
                            match.group(5), match.group(6)][:len(c) + 1])
     return fields
 
-def parse(list):
+def parse(lst):
     """Returns a list with all args needed to dl custom mp3 from nicomimi.
     
 [
@@ -114,7 +114,7 @@ def parse(list):
     .
 ]
 
-list is the name of a file with the following syntax: 
+lst is the name of a file with the following syntax: 
     Each line has 6 fields, separated with the globally defined string SEP.  The
     first field is either one of the keys in links generated from srcparse
     (i.e. rank number, with or without an 'h' prepended or 'ed') or a raw NND
@@ -132,7 +132,7 @@ list is the name of a file with the following syntax:
     s = re.compile(SEP)
 
     fields = []
-    with open(list) as src:
+    with open(lst) as src:
         for line in src:
             c = s.findall(line) # number of SEPs in line
             line = line.rstrip() + SEP * (5 - len(c))
@@ -144,9 +144,9 @@ list is the name of a file with the following syntax:
                                g('comment'), g('albumart')][:len(c) + 1])
     return fields
 
-def main(src, list, out):
+def main(src, lst, out):
     ranks = srcparse(src)
-    fields = lsparse(list, ranks)
+    fields = lsparse(lst, ranks)
 
     with open(out, 'a') as f:
         for item in fields:
@@ -162,7 +162,7 @@ if __name__ == '__main__':
     import sys
 
     src = sys.argv[1]
-    list = sys.argv[2]
+    lst = sys.argv[2]
     out = sys.argv[3]
 
-    main(src, list, out)
+    main(src, lst, out)

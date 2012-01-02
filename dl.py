@@ -181,10 +181,10 @@ dlf is the dl function to use."""
         dlf(name, *x)
         print("Finished {} ({}/{})".format(name, i + 1, length(fields)))
 
-def main(list):
+def main(lst):
     """main function.  Parses file, adds empty fields, then passes on to
 dlloop"""
-    fields = parse.parse(list)
+    fields = parse.parse(lst)
     # set comment field to id if it doesn't exist
     for x in fields:
         if len(x) < 5:
@@ -196,5 +196,5 @@ dlloop"""
 if __name__ == '__main__':
     import sys
 
-    list = sys.argv[1]
-    main(list)
+    lst = sys.argv[1]
+    main(lst)
