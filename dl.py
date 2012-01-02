@@ -24,6 +24,10 @@ either stick with 'def' or 'none'.
 Replaced entirely by dl2(), as that function is superior to this one in
 almost every single way.  This function will be kept for reference.
 
+All dl functions should take the same arguments as this one and should have the
+same return state, i.e. new file downloaded and tagged and everything else
+unchanged.
+
 """
     params = urllib.parse.urlencode({'vid' : id,
                                      'access_key1' : 'hePj8S3ewMayA',
@@ -64,7 +68,6 @@ almost every single way.  This function will be kept for reference.
     with open(file, 'wb') as f:
         f.write(data)
     conn.close()
-    print('Finished ' + file)
 
 def dl2(file, id, title, artist, album='', comment='', apic='def'):
     """Requests .mp3 download from nicomimi.net, then tags file using stagger.
@@ -86,10 +89,7 @@ either stick with 'def' or 'none'.
     with open(file, 'wb') as f:
         f.write(data)
     conn.close()
-
     tag(file, id, title, artist, album, comment, apic)
-
-    print('Finished ' + file)
 
 # TODO doesn't work yet 
 def dl3(file, id, title, artist, album='', comment='', apic='def'):
@@ -115,10 +115,7 @@ def dl3(file, id, title, artist, album='', comment='', apic='def'):
     with open(file, 'wb') as f:
         f.write(data)
     conn.close()
-
     tag(file, id, title, artist, album, comment, apic)
-
-    print('Finished ' + file)
 
 # TODO not tested yet
 def dl4(file, id, title, artist, album='', comment='', apic='def'):
@@ -177,10 +174,12 @@ here ('/' replaced with '|')
 fields as returned from lsparse.  
 dlf is the dl function to use."""
     a = re.compile(r'/')
-    for x in fields:
+    for i, x in enumerate(fields):
         name = x[1] + '.mp3'
         name = a.sub('|', name)
+        print("Fetching {}".format(name))
         dlf(name, *x)
+        print("Finished {} ({}/{})".format(name, i + 1, length(fields)))
 
 def main(list):
     """main function.  Parses file, adds empty fields, then passes on to
