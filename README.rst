@@ -5,11 +5,6 @@ vocaran_tools
 Windows tutorial
 ================
 
-NOTE: I have stopped maintaining Windows support as of 2011-07-21.  That's not
-to say vocaran_tools doesn't work on Windows, but the information provided in
-the Windows section and any Windows tools and scripts are unmaintained as from
-now.  Please refer to the Linux section for up-to-date documentation.
-
 Installing
 ----------
 
@@ -22,8 +17,10 @@ vocaran_tools is hosted on `github`_.  Download and extract the lastest version.
 
 .. _github: https://github.com/darkfeline/vocaran_tools
 
-You will also need `stagger`_ if you plan on using move_songs.py.  Download and
-extract stagger into the vocaran_tools folder.  
+You will also need `stagger`_.  YOU NEED STAGGER TO USE VOCARAN_TOOLS NOW.  It
+uses stagger to tag downloaded MP3s instead of nicomimi's custom download
+because that's been iffy lately.  Download and extract stagger into the
+vocaran_tools folder.  
 
 .. _stagger: http://pypi.python.org/pypi/stagger/0.4.2
 
@@ -48,7 +45,7 @@ In Firefox:
 3) Right-click > View Selection Source
 4) Copy all of the source and paste into src.txt
 
-In list.txt, put the songs and information, one song per line, like this::
+In rank.txt, put the songs and information, one song per line, like this::
 
     id::song_name::artist::album
 
@@ -65,10 +62,11 @@ Only the id is necessary.
 
     sm14258485::モノクロナイト::あーるP feat. 初音ミクsweet&dark
     h3::さよならメモリーズ::Ciel feat. GUMI
+    pkp::A Little Ogre::あ・め・だ・ま feat. GUMI Whisper
     ed::METROPOLIS CRISIS::MEIKO
 
 You can use NND id (e.g., sm12345679), rank number, history rank number (e.g.,
-h1, h2), or ed
+h1, h2), pkp (for pick-up) or ed
 
 Finally, run dl.bat to begin downloading.
 
@@ -78,10 +76,15 @@ Linux tutorial
 Dependencies
 ------------
 
-move_songs.py depends on `stagger`_, a Python 3 package for ID3v1/ID3v2 tag
-manipulation.
+dl.py and move_songs.py depends on `stagger`_, a Python 3 package for
+ID3v1/ID3v2 tag manipulation.
 
 .. _stagger: http://pypi.python.org/pypi/stagger/0.4.2
+
+move_songs.py additionally depends on `mp3info`_.  Download from the website or
+use your distro's package manager.
+
+.. _mp3info: http://www.ibiblio.org/mp3info/
 
 dl.py
 -----
@@ -142,7 +145,13 @@ parse.py
 
 parse.py provides any parsing tools necessary for vocaran_tools.  It is also a
 runnable script which processes rank information translation to NND id numbers.
+It uses HTML from the Vocaloidism website.
 
 Run parse.py from the command line::
     
     parse.py src list out
+
+list is formatted similarly to the input to dl.py, but the id field can
+additionally be a rank number (1-176), history rank number (h1-h5), pick-up
+(pkp) or ED (ed).  parse.py appends the lines to out, translating rank numbers
+and such into NND ids.

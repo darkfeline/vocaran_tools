@@ -13,13 +13,15 @@ The source should be the path to a file containing the html source of
 the ranking section on the relevant Vocaloidism page.  srcparse scanes the
 source and returns a dict where the key is a string which contains the rank
 number of a song, with or without an 'h' prepended (the 'h' is present for
-songs in the history section) or 'ed'.  The items each key refers to is a
+songs in the history section), 'pkp' or 'ed'.  The items each key refers to is a
 string containing the NND ID (e.g. sm123456789 or nm123456789) of that song.
 
 """
     wvr = re.compile(r'<strong>.*?([0-9]+).*?www\.nicovideo\.jp/watch/' +
                      '({})'.format(NNDID), re.I)
     wvrhis = re.compile('THIS WEEK IN HISTORY', re.I)
+    wvrpkp = re.compile(r'<strong>.*?Pick-Up.*?www\.nicovideo\.jp/watch/' +
+                        '({})'.format(NNDID), re.I)
     wvred = re.compile(r'ED Song.*?www\.nicovideo\.jp/watch/' +
                        '({})'.format(NNDID), re.I)
     links = {}
@@ -45,6 +47,10 @@ string containing the NND ID (e.g. sm123456789 or nm123456789) of that song.
                 match = wvrhis.search(line)
                 if match:
                     switch = 1
+            # check for pickup song match
+            elif wvrpkp.search(line):
+                match = wvred.search(line)
+                links['pkp'] = match.group(1)
             # check for ed song match
             elif wvred.search(line):
                 match = wvred.search(line)
@@ -64,8 +70,8 @@ def lsparse(list, links):
 list is the name of a file with the following syntax: 
     Each line has 6 fields, separated with the globally defined string SEP.
     The first field is either one of the keys in links generated from srcparse
-    (i.e. rank number, with or without an 'h' prepended or 'ed') or a raw NND
-    ID.  The rest of the fields are song name, artist, album, comment,
+    (i.e. rank number, with or without an 'h' prepended, 'pkp' or 'ed') or a
+    raw NND ID.  The rest of the fields are song name, artist, album, comment,
     albumart.
     e.g. rank_no|id::song_name::artist::album::comment::albumart
 
@@ -75,7 +81,7 @@ links is the return list from srcparse()
     # regex magic follows
     sepm = r'(?:{})'.format(SEP)
     tail = sepm.join(r'(.*?)' for x in range(5))
-    rank = re.compile(r'^(h?[0-9]+|ed)' + sepm + tail, re.I)
+    rank = re.compile(r'^(h?[0-9]+|ed|pkp)' + sepm + tail, re.I)
     idm = re.compile(r'^({})'.format(NNDID) + sepm + tail, re.I)
     s = re.compile(SEP)
 
