@@ -121,6 +121,22 @@ per line in the following format::
     #SEP = "::"
     SEP = "@@"
 
+dl functions
+````````````
+
+dl.py contains various dl functions which are passed to dlloop to use to
+download the songs.  Read the docstrings for the functions for details on each.
+
+You can also write custom dl functions if you should need to.  dl function
+names should start with dl, and take the same arguments as the base dl
+function::
+
+    def dl(file, id, title, artist, album='', comment='', apic='def'):
+
+The function returns nothing, and has the end state of a file with the given
+name created in the current directory which is the MP3 of the corresponding
+video on Nico Nico Douga, and tagged accordingly.  
+
 parse.py
 --------
 
