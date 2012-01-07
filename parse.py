@@ -20,7 +20,7 @@ string containing the NND ID (e.g. sm123456789 or nm123456789) of that song.
     wvr = re.compile(r'<strong>.*?([0-9]+).*?www\.nicovideo\.jp/watch/' +
                      '({})'.format(NNDID), re.I)
     wvrhis = re.compile('THIS WEEK IN HISTORY', re.I)
-    wvrpkp = re.compile(r'<strong>.*Pick-Up.*?www\.nicovideo\.jp/watch/' +
+    wvrpkp = re.compile(r'<strong>.*pick.*?www\.nicovideo\.jp/watch/' +
                         '({})'.format(NNDID), re.I)
     wvred = re.compile(r'ED Song.*?www\.nicovideo\.jp/watch/' +
                        '({})'.format(NNDID), re.I)
@@ -148,8 +148,12 @@ def main(number, lst, out):
     import os
     import dl
 
-    print('Getting Vocaloid HTML for week {}...'.format(number))
-    dl.getsrc('src.tmp', number)
+    if os.path.isfile(number):
+        print('{} is a file; using as src'.format(number))
+    else:
+        print('Getting Vocaloid HTML for week {}...'.format(number))
+        number = int(number)
+        dl.getsrc('src.tmp', number)
     print('parsing src...')
     ranks = srcparse('src.tmp')
     print('parsing rank...')
@@ -164,14 +168,15 @@ def main(number, lst, out):
             line = line[:len(line) - len(SEP)] # cut off final SEP
             line += '\n'
             f.write(line)
-    print('removing src.tmp...')
-    os.remove('src.tmp')
+    if os.isfile('src.tmp'):
+        print('removing src.tmp...')
+        os.remove('src.tmp')
     print('Done.')
 
 if __name__ == '__main__':
     import sys
 
-    number = int(sys.argv[1])
+    number = sys.argv[1]
     lst = sys.argv[2]
     out = sys.argv[3]
 

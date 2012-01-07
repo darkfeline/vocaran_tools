@@ -23,7 +23,8 @@ except OSError:
 
 ROOT = "/home/darkfeline/Music/VOCALOID"
 VOCALOIDS = ["初音ミク",
-             ["鏡音リン・レン", "鏡音リン", "鏡音レン", "鏡音リンレン"],
+             ["鏡音リン・レン", "鏡音レン・リン", "鏡音リン", "鏡音レン",
+              "鏡音リンレン"],
              "巡音ルカ",
              "MEIKO",
              "KAITO",
