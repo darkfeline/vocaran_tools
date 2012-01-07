@@ -150,12 +150,14 @@ def main(number, lst, out):
 
     if os.path.isfile(number):
         print('{} is a file; using as src'.format(number))
+        src = number
     else:
         print('Getting Vocaloid HTML for week {}...'.format(number))
         number = int(number)
-        dl.getsrc('src.tmp', number)
+        src = 'src.tmp'
+        dl.getsrc(src, number)
     print('parsing src...')
-    ranks = srcparse('src.tmp')
+    ranks = srcparse(src)
     print('parsing rank...')
     fields = lsparse(lst, ranks)
     print('appending to lst...')
@@ -168,7 +170,7 @@ def main(number, lst, out):
             line = line[:len(line) - len(SEP)] # cut off final SEP
             line += '\n'
             f.write(line)
-    if os.isfile('src.tmp'):
+    if os.path.isfile('src.tmp'):
         print('removing src.tmp...')
         os.remove('src.tmp')
     print('Done.')
