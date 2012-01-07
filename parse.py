@@ -171,7 +171,7 @@ def main(number, lst, out):
 if __name__ == '__main__':
     import sys
 
-    number = sys.argv[1]
+    number = int(sys.argv[1])
     lst = sys.argv[2]
     out = sys.argv[3]
 
