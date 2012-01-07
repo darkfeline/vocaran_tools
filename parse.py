@@ -148,10 +148,13 @@ def main(number, lst, out):
     import os
     import dl
 
+    print('Getting Vocaloid HTML for week {}...'.format(number))
     dl.getsrc('src.tmp', number)
+    print('parsing src...')
     ranks = srcparse('src.tmp')
+    print('parsing rank...')
     fields = lsparse(lst, ranks)
-
+    print('appending to lst...')
     with open(out, 'a') as f:
         for item in fields:
             line = ""
@@ -161,8 +164,9 @@ def main(number, lst, out):
             line = line[:len(line) - len(SEP)] # cut off final SEP
             line += '\n'
             f.write(line)
-
+    print('removing src.tmp...')
     os.remove('src.tmp')
+    print('Done.')
 
 if __name__ == '__main__':
     import sys

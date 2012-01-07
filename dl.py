@@ -194,6 +194,7 @@ dlf is the dl function to use."""
 def main(lst):
     """main function.  Parses file, adds empty fields, then passes on to
 dlloop"""
+    print('Parsing lst...')
     fields = parse.parse(lst)
     # set comment field to id if it doesn't exist
     for x in fields:
@@ -201,7 +202,9 @@ dlloop"""
             for i in range(4 - len(x)):
                 x.append('')
             x.append(x[0])
+    print('Downloading...')
     dlloop(dl2, fields)
+    print('Done.')
 
 if __name__ == '__main__':
     import sys
