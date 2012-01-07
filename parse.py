@@ -144,8 +144,12 @@ lst is the name of a file with the following syntax:
                                g('comment'), g('albumart')][:len(c) + 1])
     return fields
 
-def main(src, lst, out):
-    ranks = srcparse(src)
+def main(number, lst, out):
+    import os
+    import dl
+
+    dl.getsrc('src.tmp', number)
+    ranks = srcparse('src.tmp')
     fields = lsparse(lst, ranks)
 
     with open(out, 'a') as f:
@@ -158,11 +162,13 @@ def main(src, lst, out):
             line += '\n'
             f.write(line)
 
+    os.remove('src.tmp')
+
 if __name__ == '__main__':
     import sys
 
-    src = sys.argv[1]
+    number = sys.argv[1]
     lst = sys.argv[2]
     out = sys.argv[3]
 
-    main(src, lst, out)
+    main(number, lst, out)

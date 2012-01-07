@@ -145,11 +145,11 @@ parse.py
 
 parse.py provides any parsing tools necessary for vocaran_tools.  It is also a
 runnable script which processes rank information translation to NND id numbers.
-It uses HTML from the Vocaloidism website.
+It will fetch HTML from the Vocaloidism website given a week number.
 
 Run parse.py from the command line::
     
-    parse.py src list out
+    parse.py number list out
 
 list is formatted similarly to the input to dl.py, but the id field can
 additionally be a rank number (1-176), history rank number (h1-h5), pick-up

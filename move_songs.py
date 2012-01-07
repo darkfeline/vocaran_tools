@@ -59,6 +59,14 @@ each."""
         process(f)
 
 def process(file):
+    tag = stagger.read_tag(file)
+    title = tag.title
+    artist = tag.artist
+    print("-" * 60)
+    print("File: " + file)
+    print("Title: " + title)
+    print("Artist: " + artist)
+
     # check file size for zero length files
     if os.path.getsize(file) < 500:
         print('File size is ' + str(os.path.getsize(file)) + 
@@ -69,10 +77,6 @@ def process(file):
             return
         else:
             print('Continuing ({} may be corrupt)'.format(file))
-
-    tag = stagger.read_tag(file)
-    title = tag.title
-    artist = tag.artist
 
     imatch = []
     for i, p in enumerate(PVOCALOIDS):
@@ -93,10 +97,6 @@ def process(file):
     else:
         guess = None
 
-    print("-" * 60)
-    print("File: " + file)
-    print("Title: " + title)
-    print("Artist: " + artist)
     if not guess:
         print("Couldn't guess directory")
         for i, n in enumerate(VOCALOIDS):
@@ -131,7 +131,8 @@ def process(file):
         # Deal with if file already exists
         print()
         if os.path.isdir(os.path.join(newp, file)):
-            print("{} is a directory; skipping".format(os.path.join(newp, file)))
+            print("{} is a directory; skipping".format(os.path.join(newp,
+                                                                    file)))
         elif os.path.isfile(os.path.join(newp, file)):
             print("{} exists. Replace?".format(os.path.join(newp, file)))
 

@@ -167,6 +167,16 @@ def getpic(file, id, apic='def'):
         f.write(data)
     conn.close()
 
+def getsrc(outfile, number);
+    """Downloads page source from Vocaloidism for Vocaran Week and saves in a
+file."""
+    conn = urllib.request.urlopen(
+        'http://www.vocaloidism.com/weekly-vocaloid-ranking-{}/'.format(number))
+    data = conn.read()
+    with open(file, 'wb') as f:
+        f.write(data)
+    conn.close()
+
 def dlloop(dlf, fields):
     """Loops a dl function over fields.  file name illegal char handling is
 here ('/' replaced with '|')
