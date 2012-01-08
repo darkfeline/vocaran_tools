@@ -55,9 +55,6 @@ string containing the NND ID (e.g. sm123456789 or nm123456789) of that song.
                 match = wvrhis.search(line)
                 if match:
                     switch = 1
-    if not checklinks(links):
-        raise Exception('srcparse links is incomplete.  Check src and/or \
-                        srcparse')
     return links
 
 def checklinks(links):
@@ -171,6 +168,10 @@ def main(number, lst, out):
         dl.getsrc(src, number)
     print('parsing src...')
     ranks = srcparse(src)
+    print('checking parsed links...')
+    if not checklinks(links):
+        raise Exception('srcparse links is incomplete.  Check src and/or \
+                        srcparse')
     print('parsing rank...')
     fields = lsparse(lst, ranks)
     print('appending to lst...')
