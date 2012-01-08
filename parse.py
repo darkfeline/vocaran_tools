@@ -55,7 +55,20 @@ string containing the NND ID (e.g. sm123456789 or nm123456789) of that song.
                 match = wvrhis.search(line)
                 if match:
                     switch = 1
+    if not checklinks(links):
+        raise Exception('srcparse links is incomplete.  Check src and/or \
+                        srcparse')
     return links
+
+def checklinks(links):
+    """Checks if the links returned from srcparse() is complete or not."""
+    given = set(links)
+    expected = set([str(i) for i in range(1,31)] + 
+                   ['h{}'.format(i) for i in range(1,6)] + ['pkp', 'ed'])
+    if len(given & expected) < len(expected):
+        return False
+    else:
+        return True
 
 def lsparse(lst, links):
     """Returns a list with all args needed to dl custom mp3 from nicomimi.
