@@ -22,13 +22,13 @@ except OSError:
     raise Exception('move_songs.py depends on mp3info')
 
 ROOT = "/home/darkfeline/Music/VOCALOID"
-VOCALOIDS = ["初音ミク",
+VOCALOIDS = [["初音ミク", "ミク"],
              ["鏡音リン・レン", "鏡音レン・リン", "鏡音リン", "鏡音レン",
               "鏡音リンレン"],
-             "巡音ルカ",
-             "MEIKO",
-             "KAITO",
-             "GUMI",
+             ["巡音ルカ", "ルカ"],
+             ["MEIKO", "Meiko", "メイコ"],
+             ["KAITO", "Kaito", "カイト"],
+             "GUMI", 
              "Lily",
              "VY1",
              "VY2",
@@ -38,7 +38,8 @@ VOCALOIDS = ["初音ミク",
              "空音ラナ",
              ["開発コード miki", "開発コードmiki", "miki"],
              ["神威がくぽ", "がくぽ"],
-             "氷山キヨテル"
+             "氷山キヨテル",
+             ["IA -ARIA ON THE PLANETES-", "IA"]
             ]
 PVOCALOIDS = []
 for a in VOCALOIDS:
