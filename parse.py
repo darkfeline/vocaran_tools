@@ -169,7 +169,7 @@ def main(number, lst, out):
     print('parsing src...')
     ranks = srcparse(src)
     print('checking parsed links...')
-    if not checklinks(links):
+    if not checklinks(ranks):
         raise Exception('srcparse links is incomplete.  Check src and/or \
                         srcparse')
     print('parsing rank...')
