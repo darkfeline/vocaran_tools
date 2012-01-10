@@ -41,7 +41,8 @@ VOCALOIDS = [["初音ミク", "ミク"],
              "氷山キヨテル",
              ["IA -ARIA ON THE PLANETES-", "IA"],
              "CUL",
-             "結月ゆかり"
+             "結月ゆかり",
+             "歌手音ピコ"
             ]
 PVOCALOIDS = []
 for a in VOCALOIDS:
