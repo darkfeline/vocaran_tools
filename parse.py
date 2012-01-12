@@ -58,14 +58,12 @@ string containing the NND ID (e.g. sm123456789 or nm123456789) of that song.
     return links
 
 def checklinks(links):
-    """Checks if the links returned from srcparse() is complete or not."""
+    """Checks if the links returned from srcparse() is complete or not.
+Returns a set of expected keys that are missing."""
     given = set(links)
     expected = set([str(i) for i in range(1,31)] + 
                    ['h{}'.format(i) for i in range(1,6)] + ['pkp', 'ed'])
-    if len(given & expected) < len(expected):
-        return False
-    else:
-        return True
+    return expected - given
 
 def lsparse(lst, links):
     """Returns a list with all args needed to dl custom mp3 from nicomimi.
@@ -169,9 +167,9 @@ def main(number, lst, out):
     print('parsing src...')
     ranks = srcparse(src)
     print('checking parsed links...')
-    if not checklinks(ranks):
+    if checklinks(ranks):
         raise Exception('srcparse links is incomplete.  Check src and/or \
-                        srcparse')
+                        srcparse', checklinks(ranks))
     print('parsing rank...')
     fields = lsparse(lst, ranks)
     print('appending to lst...')
