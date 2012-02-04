@@ -177,19 +177,39 @@ file."""
         f.write(data)
     conn.close()
 
-def dlloop(dlf, fields):
-    """Loops a dl function over fields.  file name illegal char handling is
-here ('/' replaced with '|')
+def dlloop(dlf, fields, filename):
+    """Loops a dl function over fields.  Prints output for convenience.  Also
+handles pause/restore.  file name illegal char handling is here ('/' replaced
+with '|')
     
 fields as returned from lsparse.  
-dlf is the dl function to use."""
+dlf is the dl function to use.
+filename is name of file.
+
+"""
     a = re.compile(r'/')
-    for i, x in enumerate(fields):
-        name = x[1] + '.mp3'
-        name = a.sub('|', name)
-        print("Fetching {}".format(name))
-        dlf(name, *x)
-        print("Finished {} ({}/{})".format(name, i + 1, len(fields)))
+    filename = '.' + filename + '.dl.py.dat'
+    try:
+        j = 0
+        if os.path.isfile(filename):
+            print('Loading last session...')
+            with open(filename) as f:
+                j = int(f.read())
+                fields = fields[j:]
+        for i, x in enumerate(fields):
+            name = x[1] + '.mp3'
+            name = a.sub('|', name)
+            print("Fetching {} ({}/{})".format(
+                name, i + j + 1, len(fields) + j))
+            dlf(name, *x)
+            print("Finished {} ({}/{})".format(
+                name, i + j + 1, len(fields) + j))
+    except (Exception, KeyboardInterrupt) as e:
+        if 'i' in locals():
+            print('Writing current session...')
+            with open(filename, 'w') as f:
+                f.write(str(i + j))
+        raise e
 
 def main(lst):
     """main function.  Parses file, adds empty fields, then passes on to
@@ -203,7 +223,7 @@ dlloop"""
                 x.append('')
             x.append(x[0])
     print('Downloading...')
-    dlloop(dl2, fields)
+    dlloop(dl2, fields, lst)
     print('Done.')
 
 if __name__ == '__main__':
