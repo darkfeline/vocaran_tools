@@ -210,6 +210,9 @@ filename is name of file.
             with open(filename, 'w') as f:
                 f.write(str(i + j))
         raise e
+    else:
+        if os.path.isfile(filename):
+            os.remove(filename)
 
 def main(lst):
     """main function.  Parses file, adds empty fields, then passes on to
