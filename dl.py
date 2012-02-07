@@ -7,6 +7,7 @@ import urllib.request
 import urllib.error
 import http.cookiejar
 import subprocess
+import hashlib
 
 import stagger
 from stagger.id3 import *
@@ -179,23 +180,29 @@ file."""
 
 def dlloop(dlf, fields, filename):
     """Loops a dl function over fields.  Prints output for convenience.  Also
-handles pause/restore.  file name illegal char handling is here ('/' replaced
-with '|')
+handles pause/restore session.  file name illegal char handling is here ('/'
+replaced with '|')
     
 fields as returned from lsparse.  
 dlf is the dl function to use.
-filename is name of file.
+filename is name of file (to generate session dat file).
 
 """
     a = re.compile(r'/')
-    filename = '.' + filename + '.dl.py.dat'
+    sessionfile= '.' + filename + '.dl.py.dat'
     try:
         j = 0
-        if os.path.isfile(filename):
+        if os.path.isfile(sessionfile):
             print('Loading last session...')
-            with open(filename) as f:
-                j = int(f.read())
-                fields = fields[j:]
+            with open(sessionfile) as f:
+                with open(filename) as g:
+                    if (hashlib.sha256(g.read().encode('UTF-8')).hexdigest() !=
+                        f.readline().rstrip()):
+                        print("Dat file checksum differs from file;" +
+                              "ignoring session")
+                    else:
+                        j = int(f.readline())
+                        fields = fields[j:]
         for i, x in enumerate(fields):
             name = x[1] + '.mp3'
             name = a.sub('|', name)
@@ -207,12 +214,14 @@ filename is name of file.
     except (Exception, KeyboardInterrupt) as e:
         if 'i' in locals():
             print('Writing current session...')
-            with open(filename, 'w') as f:
-                f.write(str(i + j))
+            with open(sessionfile, 'w') as f:
+                with open(filename) as g:
+                    f.write(hashlib.sha256(g.read()).hexdigest() + "\n")
+                    f.write(str(i + j))
         raise e
     else:
-        if os.path.isfile(filename):
-            os.remove(filename)
+        if os.path.isfile(sessionfile):
+            os.remove(sessionfile)
 
 def main(lst):
     """main function.  Parses file, adds empty fields, then passes on to
