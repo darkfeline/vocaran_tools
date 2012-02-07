@@ -216,7 +216,8 @@ filename is name of file (to generate session dat file).
             print('Writing current session...')
             with open(sessionfile, 'w') as f:
                 with open(filename) as g:
-                    f.write(hashlib.sha256(g.read()).hexdigest() + "\n")
+                    f.write(hashlib.sha256(g.read().encode('UTF-8')).hexdigest()
+                                           + "\n")
                     f.write(str(i + j))
         raise e
     else:
