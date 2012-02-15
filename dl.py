@@ -8,6 +8,7 @@ import urllib.error
 import http.cookiejar
 import subprocess
 import hashlib
+import getopt
 
 import stagger
 from stagger.id3 import *
@@ -178,7 +179,7 @@ file."""
         f.write(data)
     conn.close()
 
-def dlloop(dlf, fields, filename):
+def dlloop(dlf, fields, filename, optlist):
     """Loops a dl function over fields.  Prints output for convenience.  Also
 handles pause/restore session.  file name illegal char handling is here ('/'
 replaced with '|')
@@ -186,47 +187,61 @@ replaced with '|')
 fields as returned from lsparse.  
 dlf is the dl function to use.
 filename is name of file (to generate session dat file).
+optlist is list of arguments.
 
 """
     a = re.compile(r'/')
     sessionfile= '.' + filename + '.dl.py.dat'
-    try:
-        j = 0
-        if os.path.isfile(sessionfile):
-            print('Loading last session...')
-            with open(sessionfile) as f:
-                with open(filename) as g:
-                    if (hashlib.sha256(g.read().encode('UTF-8')).hexdigest() !=
-                        f.readline().rstrip()):
-                        print("Dat file checksum differs from file;" +
-                              "ignoring session")
-                    else:
-                        j = int(f.readline())
-                        fields = fields[j:]
-        for i, x in enumerate(fields):
-            name = x[1] + '.mp3'
-            name = a.sub('|', name)
-            print("Fetching {} ({}/{})".format(
-                name, i + j + 1, len(fields) + j))
-            dlf(name, *x)
-            print("Finished {} ({}/{})".format(
-                name, i + j + 1, len(fields) + j))
-    except (Exception, KeyboardInterrupt) as e:
-        if 'i' in locals():
-            print('Writing current session...')
-            with open(sessionfile, 'w') as f:
-                with open(filename) as g:
-                    f.write(hashlib.sha256(g.read().encode('UTF-8')).hexdigest()
-                                           + "\n")
-                    f.write(str(i + j))
-        raise e
-    else:
-        if os.path.isfile(sessionfile):
-            os.remove(sessionfile)
+    j = 0
+    # load session
+    if os.path.isfile(sessionfile):
+        print('Loading last session...')
+        with open(sessionfile) as f:
+            with open(filename) as g:
+                if (hashlib.sha256(
+                        g.read().encode('UTF-8')
+                    ).hexdigest() != f.readline().rstrip()):
+                    print("Dat file checksum differs from file;" +
+                          "ignoring session")
+                else:
+                    j = int(f.readline())
+                    fields = fields[j:]
+    # loop over each dl
+    for i, x in enumerate(fields):
+        name = x[1] + '.mp3'
+        name = a.sub('|', name)
+        print("Fetching {} ({}/{})".format(
+            name, i + j + 1, len(fields) + j))
+        while True:
+            try:
+                dlf(name, *x)
+            except (Exception, KeyboardInterrupt) as e:
+                # retry if force flag is set
+                if (isinstance(e, urllib.error.URLError) and 
+                '-f' in [opt[0] for opt in optlist]):
+                    print('URLError: retrying...')
+                    continue
+                elif 'i' in locals():
+                    print('Writing current session...')
+                    with open(sessionfile, 'w') as f:
+                        with open(filename) as g:
+                            f.write(hashlib.sha256(
+                                g.read().encode('UTF-8')).hexdigest() + "\n")
+                            f.write(str(i + j))
+                raise
+        print("Finished {} ({}/{})".format(
+            name, i + j + 1, len(fields) + j))
+    if os.path.isfile(sessionfile):
+        os.remove(sessionfile)
 
-def main(lst):
+def main(lst, optlist):
     """main function.  Parses file, adds empty fields, then passes on to
-dlloop"""
+dlloop
+
+lst is name of file
+optlist is list of arguments
+
+"""
     print('Parsing lst...')
     fields = parse.parse(lst)
     # set comment field to id if it doesn't exist
@@ -236,11 +251,12 @@ dlloop"""
                 x.append('')
             x.append(x[0])
     print('Downloading...')
-    dlloop(dl2, fields, lst)
+    dlloop(dl2, fields, lst, optlist)
     print('Done.')
 
 if __name__ == '__main__':
     import sys
 
-    lst = sys.argv[1]
-    main(lst)
+    optlist, args = getopt.getopt(sys.argv[1:], 'f')
+    lst = args[0]
+    main(lst, optlist)
