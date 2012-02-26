@@ -19,9 +19,8 @@ dl.py
 -----
 
 dl.py facilitates bulk downloading of Nico Nico Douga (NND) songs through
-nicomimi.net.  It can match weekly Vocaran rank numbers to the respective
-song's NND id using the HTML source from the respective Vocaloidism page.  Run
-dl.py from the command line::
+nicomimi.net.  It no longer translates rank numbers into NNDIDs; this
+functionality is now in parse.py.  Run dl.py from the command line::
 
     dl.py list
 
@@ -81,6 +80,29 @@ Run parse.py from the command line::
     parse.py number list out
 
 list is formatted similarly to the input to dl.py, but the id field can
-additionally be a rank number (1-176), history rank number (h1-h5), pick-up
-(pkp) or ED (ed).  parse.py appends the lines to out, translating rank numbers
-and such into NND ids.
+additionally be a rank number (1-150ish, depending on the week), history rank
+number (h1-h5), pick-up (pkp) or ED (ed).  parse.py appends the lines to out,
+translating rank numbers and such into NND ids.
+
+number can either be the week number, or the name of a file containing the HTML
+source downloaded from the respective Vocaloidism page.
+
+move_songs.py
+-------------
+
+move_songs.py automates moving downloaded songs into your music directory.
+Edit move_songs.py and change::
+    
+    ROOT = "/home/darkfeline/Music/VOCALOID"
+
+to your own music directory.  The assumed directory structure is thus: songs
+sung by a single VOCALOID are moved into their own subdirectory, and songs sung
+by more than one VOCALOID are moved into the root directory.  move_songs.py
+will parse each song's artist tag and select a destination directory, prompting
+for confirmation.  If it cannot guess, it will prompt you to manually select a
+directory.  
+
+Additionally, move_songs.py will check for corrupt downloads (when the song is
+less than a certain size), and prompt to skip.  These generally result from
+when the song is not available via the selected dl function, yielding an html
+erro page instead of a valid mp3 file.
