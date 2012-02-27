@@ -9,6 +9,7 @@ import http.cookiejar
 import subprocess
 import hashlib
 import getopt
+import sys
 
 import stagger
 from stagger.id3 import *
@@ -179,21 +180,9 @@ file."""
         f.write(data)
     conn.close()
 
-def dlloop(dlf, fields, filename, optlist):
-    """Loops a dl function over fields.  Prints output for convenience.  Also
-handles pause/restore session.  file name illegal char handling is here ('/'
-replaced with '|')
-    
-fields as returned from lsparse.  
-dlf is the dl function to use.
-filename is name of file (to generate session dat file).
-optlist is list of arguments.
-
-"""
-    a = re.compile(r'/')
-    sessionfile= '.' + filename + '.dl.py.dat'
+def load_session(sessionfile, filename):
+    """Returns index from session file.  Uses filename to check md5sum.  """
     j = 0
-    # load session
     if os.path.isfile(sessionfile):
         print('Loading last session...')
         with open(sessionfile) as f:
@@ -205,30 +194,58 @@ optlist is list of arguments.
                           "ignoring session")
                 else:
                     j = int(f.readline())
-                    fields = fields[j:]
+    return j
+
+def save_session(sessionfile, filename, i):
+    """Save index to sessionfile)."""
+    print('Writing current session...')
+    with open(sessionfile, 'w') as f:
+        with open(filename) as g:
+            f.write(hashlib.sha256(
+                g.read().encode('UTF-8')).hexdigest() + "\n")
+            f.write(str(i + j))
+
+def dlloop(dlf, fields, filename, optlist):
+    """Loops a dl function over fields.  Prints output for convenience.  Also
+handles pause/restore session.  file name illegal char handling is here ('/'
+replaced with '|')
+    
+fields as returned from lsparse.  
+dlf is the dl function to use.
+filename is name of file (to generate session dat file).
+optlist is list of arguments.
+
+"""
+    re_illegal = re.compile(r'/')
+    re_error = re.compile(r'[Errno 110]')
+    sessionfile= '.' + filename + '.dl.py.dat'
+    # load session
+    j = load_session(sessionfile, filename)
+    fields = fields[j:]
     # loop over each dl
     for i, x in enumerate(fields):
         name = x[1] + '.mp3'
-        name = a.sub('|', name)
+        name = re_illegal.sub('|', name)
         print("Fetching {} ({}/{})".format(
             name, i + j + 1, len(fields) + j))
         while True:
             try:
                 dlf(name, *x)
-            except (Exception, KeyboardInterrupt) as e:
-                # retry if force flag is set
-                if (isinstance(e, urllib.error.URLError) and 
-                '-f' in [opt[0] for opt in optlist]):
-                    print('URLError: retrying...')
-                    continue
-                elif 'i' in locals():
-                    print('Writing current session...')
-                    with open(sessionfile, 'w') as f:
-                        with open(filename) as g:
-                            f.write(hashlib.sha256(
-                                g.read().encode('UTF-8')).hexdigest() + "\n")
-                            f.write(str(i + j))
-                raise
+            except KeyboardInterrupt as e:
+                if 'i' in locals():
+                    save_session(sessionfile, filename, i)
+                sys.exit()
+            except urllib.error.URLError as e:
+                if re_error.search(str(e)):
+                    if '-f' in [opt[0] for opt in optlist]:
+                        print('URLError: retrying...')
+                        continue
+                    else:
+                        save_session(sessionfile, i)
+                        print('URLError: exiting...')
+                        sys.exit()
+            else:
+                break
         print("Finished {} ({}/{})".format(
             name, i + j + 1, len(fields) + j))
     if os.path.isfile(sessionfile):
