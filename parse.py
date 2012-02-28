@@ -7,16 +7,17 @@ NNDID = '[sn][mo][0-9]+'
 
 def srcparse(source):
     """Returns a dict with song rank keys mapped to corresponding NND IDs using
-the html source from Vocaloidism.
-    
-The source should be the path to a file containing the html source of
-the ranking section on the relevant Vocaloidism page.  srcparse scanes the
-source and returns a dict where the key is a string which contains the rank
-number of a song, with or without an 'h' prepended (the 'h' is present for
-songs in the history section), 'pkp' or 'ed'.  The items each key refers to is a
-string containing the NND ID (e.g. sm123456789 or nm123456789) of that song.
+    the html source from Vocaloidism.
+        
+    The source should be the path to a file containing the html source of the
+    ranking section on the relevant Vocaloidism page.  srcparse scanes the
+    source and returns a dict where the key is a string which contains the rank
+    number of a song, with or without an 'h' prepended (the 'h' is present for
+    songs in the history section), 'pkp' or 'ed'.  The items each key refers to
+    is a string containing the NND ID (e.g. sm123456789 or nm123456789) of that
+    song.
 
-"""
+    """
     wvr = re.compile(r'<strong>.*?([0-9]+).*?www\.nicovideo\.jp/watch/' +
                      '({})'.format(NNDID), re.I)
     wvrhis = re.compile('THIS WEEK IN HISTORY', re.I)
@@ -59,7 +60,7 @@ string containing the NND ID (e.g. sm123456789 or nm123456789) of that song.
 
 def checklinks(links):
     """Checks if the links returned from srcparse() is complete or not.
-Returns a set of expected keys that are missing."""
+    Returns a set of expected keys that are missing."""
     given = set(links)
     expected = set([str(i) for i in range(1,31)] + 
                    ['h{}'.format(i) for i in range(1,6)] + ['pkp', 'ed'])
@@ -68,24 +69,24 @@ Returns a set of expected keys that are missing."""
 def lsparse(lst, links):
     """Returns a list with all args needed to dl custom mp3 from nicomimi.
     
-[
-    [id, song_name, artist, album, comment, albumart],
-    .
-    .
-    .
-]
+    [
+        [id, song_name, artist, album, comment, albumart],
+        .
+        .
+        .
+    ]
 
-lst is the name of a file with the following syntax: 
-    Each line has 6 fields, separated with the globally defined string SEP.
-    The first field is either one of the keys in links generated from srcparse
-    (i.e. rank number, with or without an 'h' prepended, 'pkp' or 'ed') or a
-    raw NND ID.  The rest of the fields are song name, artist, album, comment,
-    albumart.
-    e.g. rank_no|id::song_name::artist::album::comment::albumart
+    lst is the name of a file with the following syntax: 
+        Each line has 6 fields, separated with the globally defined string SEP.
+        The first field is either one of the keys in links generated from
+        srcparse (i.e. rank number, with or without an 'h' prepended, 'pkp' or
+        'ed') or a raw NND ID.  The rest of the fields are song name, artist,
+        album, comment, albumart.  e.g.
+        rank_no|id::song_name::artist::album::comment::albumart
 
-links is the return list from srcparse()
+    links is the return list from srcparse()
 
-"""
+    """
     # regex magic follows
     sepm = r'(?:{})'.format(SEP)
     tail = sepm.join(r'(.*?)' for x in range(5))
@@ -115,22 +116,22 @@ links is the return list from srcparse()
 def parse(lst):
     """Returns a list with all args needed to dl custom mp3 from nicomimi.
     
-[
-    [id, song_name, artist, album, comment, albumart],
-    .
-    .
-    .
-]
+    [
+        [id, song_name, artist, album, comment, albumart],
+        .
+        .
+        .
+    ]
 
-lst is the name of a file with the following syntax: 
-    Each line has 6 fields, separated with the globally defined string SEP.  The
-    first field is either one of the keys in links generated from srcparse
-    (i.e. rank number, with or without an 'h' prepended or 'ed') or a raw NND
-    ID.  The rest of the fields are song name, artist, album, comment,
-    albumart.
-    e.g. id::song_name::artist::album::comment::albumart
+    lst is the name of a file with the following syntax: 
+        Each line has 6 fields, separated with the globally defined string SEP.
+        The first field is either one of the keys in links generated from
+        srcparse (i.e. rank number, with or without an 'h' prepended or 'ed')
+        or a raw NND ID.  The rest of the fields are song name, artist, album,
+        comment, albumart.  e.g.
+        id::song_name::artist::album::comment::albumart
 
-"""
+    """
     # regex magic follows
     sep = r'(?:{})'.format(SEP)
     idp = re.compile(sep.join([r'^(?P<id>{})'.format(NNDID), r'(?P<title>.*?)',

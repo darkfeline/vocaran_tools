@@ -19,19 +19,19 @@ import parse
 def dl(file, id, title, artist, album='', comment='', apic='def'):
     """Requests custom .mp3 from nicomimi.net
 
-file should probably match name and end in '.mp3' as the right extension.
-apic can be 'none' (no albumart), 'def' (default art), and an arbitrary number
-of string depending on the song, thus: '1', '2', '3'  It's probably better to
-either stick with 'def' or 'none'.
+    file should probably match name and end in '.mp3' as the right extension.
+    apic can be 'none' (no albumart), 'def' (default art), and an arbitrary
+    number of string depending on the song, thus: '1', '2', '3'  It's probably
+    better to either stick with 'def' or 'none'.
 
-Replaced entirely by dl2(), as that function is superior to this one in
-almost every single way.  This function will be kept for reference.
+    Replaced entirely by dl2(), as that function is superior to this one in
+    almost every single way.  This function will be kept for reference.
 
-All dl functions should take the same arguments as this one and should have the
-same return state, i.e. new file downloaded and tagged and everything else
-unchanged.
+    All dl functions should take the same arguments as this one and should have
+    the same return state, i.e. new file downloaded and tagged and everything
+    else unchanged.
 
-"""
+    """
     params = urllib.parse.urlencode({'vid' : id,
                                      'access_key1' : 'hePj8S3ewMayA',
                                      'access_key2' : '13jsAnxfaKEE6',
@@ -75,12 +75,12 @@ unchanged.
 def dl2(file, id, title, artist, album='', comment='', apic='def'):
     """Requests .mp3 download from nicomimi.net, then tags file using stagger.
 
-file should probably match name and end in '.mp3' as the right extension.
-apic can be 'none' (no albumart), 'def' (default art), and an arbitrary number
-of string depending on the song, thus: '1', '2', '3'  It's probably better to
-either stick with 'def' or 'none'.
+    file should probably match name and end in '.mp3' as the right extension.
+    apic can be 'none' (no albumart), 'def' (default art), and an arbitrary
+    number of string depending on the song, thus: '1', '2', '3'  It's probably
+    better to either stick with 'def' or 'none'.
 
-"""
+    """
     cj = http.cookiejar.CookieJar()
     opener = urllib.request.build_opener(
         urllib.request.HTTPCookieProcessor(cj))
@@ -123,14 +123,14 @@ def dl3(file, id, title, artist, album='', comment='', apic='def'):
 # TODO not tested yet
 def dl4(file, id, title, artist, album='', comment='', apic='def'):
     """Requests .mp3 download from nicomimi.net using wget and subprocess, then
-tags file using stagger.
+    tags file using stagger.
 
-file should probably match name and end in '.mp3' as the right extension.
-apic can be 'none' (no albumart), 'def' (default art), and an arbitrary number
-of string depending on the song, thus: '1', '2', '3'  It's probably better to
-either stick with 'def' or 'none'.
+    file should probably match name and end in '.mp3' as the right extension.
+    apic can be 'none' (no albumart), 'def' (default art), and an arbitrary
+    number of string depending on the song, thus: '1', '2', '3'  It's probably
+    better to either stick with 'def' or 'none'.
 
-"""
+    """
     subprocess.call(['wget', 
                      'http://media2.nicomimi.net/get?vid={}'.format(id)])
     tag(file, id, title, artist, album, comment, apic)
@@ -138,7 +138,7 @@ either stick with 'def' or 'none'.
 
 def tag(file, id, title, artist, album='', comment='', apic='def'):
     """Tags mp3 using stagger.  NOTE: comment is tagged as COMM, as opposed to
-USLT that nicomimi.net custom uses for comments/lyrics."""
+    USLT that nicomimi.net custom uses for comments/lyrics."""
     # get pic
     getpic(file + '.jpg', id, apic)
 
@@ -172,7 +172,7 @@ def getpic(file, id, apic='def'):
 
 def getsrc(outfile, number):
     """Downloads page source from Vocaloidism for Vocaran Week and saves in a
-file."""
+    file."""
     conn = urllib.request.urlopen(
         'http://www.vocaloidism.com/weekly-vocaloid-ranking-{}/'.format(number))
     data = conn.read()
@@ -207,15 +207,14 @@ def save_session(sessionfile, filename, i):
 
 def dlloop(dlf, fields, filename, optlist):
     """Loops a dl function over fields.  Prints output for convenience.  Also
-handles pause/restore session.  file name illegal char handling is here ('/'
-replaced with '|')
+    handles pause/restore session.  file name illegal char handling is here
+    ('/' replaced with '|')
     
-fields as returned from lsparse.  
-dlf is the dl function to use.
-filename is name of file (to generate session dat file).
-optlist is list of arguments.
+    fields as returned from lsparse.  dlf is the dl function to use.  filename
+    is name of file (to generate session dat file).  optlist is list of
+    arguments.
 
-"""
+    """
     re_illegal = re.compile(r'/')
     re_error = re.compile(r'[Errno 110]')
     sessionfile= '.' + filename + '.dl.py.dat'
@@ -252,13 +251,11 @@ optlist is list of arguments.
         os.remove(sessionfile)
 
 def main(lst, optlist):
-    """main function.  Parses file, adds empty fields, then passes on to
-dlloop
+    """main function.  Parses file, adds empty fields, then passes on to dlloop
 
-lst is name of file
-optlist is list of arguments
+    lst is name of file optlist is list of arguments
 
-"""
+    """
     print('Parsing lst...')
     fields = parse.parse(lst)
     # set comment field to id if it doesn't exist
