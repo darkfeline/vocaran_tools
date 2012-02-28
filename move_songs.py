@@ -11,6 +11,7 @@ import re
 import shutil
 import time
 import subprocess
+import itertools
 
 import stagger
 
@@ -56,12 +57,72 @@ for a in VOCALOIDS:
 
 def main():
     """Finds all MP3s in current directory by extension and runs process() on
-each."""
+    each."""
     dir = os.listdir(os.getcwd())
     p = re.compile(r".*\.mp3$", re.I)
     dir = [f for f in dir if p.match(f)]
     for f in dir:
         process(f)
+
+def print_vocaloid_prompt():
+    """Pretty prints vocaloid choice prompt"""
+    # Make string list
+    x = []
+    for i, n in enumerate(VOCALOIDS):
+        if isinstance(n, list):
+            n = n[0]
+        x.append(str(i) + " " + n)
+    # Find optimum # of cols
+    max_width = 60
+    cols = 1
+    while sum(col_width(x, cols)) + cols <= max_width:
+        cols += 1
+    cols -= 1 # we went over one in while loop
+    widths = col_width(x, cols)
+    # split list into rows
+    x = make_col(x, cols) # vert, column-wise
+    x = itertools.zip_longest(*x, fillvalue="") # make row-wise
+    # build print template
+    temp = ""
+    for i in range(cols):
+        temp += "{{{0}:{1}}}".format(i, widths[i])
+        temp += '|'
+    temp = temp[:-1]  # drop last separator
+    for row in x:
+        print(temp.format(*row))
+
+    print("r base directory: " + ROOT)
+    print("s skip")
+
+def make_col(x, cols, vert=True):
+    """Returns a list with list x split into some number of columns, with
+    entries going vertically (succeeding values in column) or horizontally
+    (succeeding values going across columns)."""
+    if vert:
+        base_height = len(x) // cols
+        extra_height = len(x) % cols
+        y = []
+        a = 0
+        for i in range(cols):
+            b = a + base_height
+            if extra_height > 0:
+                b += 1
+                extra_height -= 1
+            y.append(x[a:b])
+            a = b
+    else:
+        y = [x[a:a + cols] for a in range(0, len(x), cols)]  # row-wise, horiz
+    return y
+
+def col_width(x, cols, vert=True):
+    """Returns a list of the column widths if a tuple of strings is split into
+    some number of columns going vertically (succeeding values in column) or
+    horizontally (succeeding values going across columns)."""
+    y = make_col(x, cols, vert)
+    widths = []
+    for col in y:
+        widths.append(len(max(col, key=len)))
+    return widths
 
 def process(file):
     tag = stagger.read_tag(file)
@@ -104,12 +165,7 @@ def process(file):
 
     if not guess:
         print("Couldn't guess directory")
-        for i, n in enumerate(VOCALOIDS):
-            if isinstance(n, list):
-                n = n[0]
-            print(str(i) + " " + n)
-        print("r base directory: " + ROOT)
-        print("s skip")
+        print_vocaloid_prompt()
         i = input("destination?")
         if i.lower() == "r":
             guess = ""
