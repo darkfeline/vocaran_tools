@@ -203,7 +203,7 @@ def save_session(sessionfile, filename, i):
         with open(filename) as g:
             f.write(hashlib.sha256(
                 g.read().encode('UTF-8')).hexdigest() + "\n")
-            f.write(str(i + j))
+            f.write(str(i))
 
 def dlloop(dlf, fields, filename, optlist):
     """Loops a dl function over fields.  Prints output for convenience.  Also
@@ -233,7 +233,7 @@ optlist is list of arguments.
                 dlf(name, *x)
             except KeyboardInterrupt as e:
                 if 'i' in locals():
-                    save_session(sessionfile, filename, i)
+                    save_session(sessionfile, filename, i + j)
                 sys.exit()
             except urllib.error.URLError as e:
                 if re_error.search(str(e)):
