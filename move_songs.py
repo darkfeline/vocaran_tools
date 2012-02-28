@@ -207,11 +207,10 @@ def process(file):
             length = length.lstrip('0:')
             mtime = time.strftime("%a, %d %b %Y %H:%M:%S +0000",
                       time.gmtime(os.path.getmtime(os.path.join(newp, file))))
-            print("""Old: 
-Title:{title} 
-Artist:{artist} 
-Length:{length}
-mtime:{mtime}""".format(title=title, artist=artist, length=length, mtime=mtime))
+            template = "Old:\nTitle:{title}\nArtist:{artist}\nLength:{length}\
+                    \nmtime:{mtime}"
+            print(template.format(title=title, artist=artist, length=length,
+                                  mtime=mtime))
 
             tag = stagger.read_tag(oldp)
             title = tag.title
@@ -223,11 +222,8 @@ mtime:{mtime}""".format(title=title, artist=artist, length=length, mtime=mtime))
             length = length.lstrip('0:')
             mtime = time.strftime("%a, %d %b %Y %H:%M:%S +0000",
                       time.gmtime(os.path.getmtime(oldp)))
-            print("""New: 
-Title:{title} 
-Artist:{artist} 
-Length:{length}
-mtime:{mtime}""".format(title=title, artist=artist, length=length, mtime=mtime))
+            print(template.format(title=title, artist=artist, length=length,
+                                  mtime=mtime))
 
             i = input("[y]/n? ").lower()
             if i in ("y", "yes", ""):
