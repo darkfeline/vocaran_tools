@@ -29,8 +29,16 @@ def srcparse(source):
     switch = 0
     with open(source) as src:
         for line in src:
-            # first scan line for song
-            if wvr.search(line):
+            # check for pickup song match
+            if wvrpkp.search(line):
+                match = wvrpkp.search(line)
+                links['pkp'] = match.group(1)
+            # check for ed song match
+            elif wvred.search(line):
+                match = wvred.search(line)
+                links['ed'] = match.group(1)
+            # scan line for song
+            elif wvr.search(line):
                 match = wvr.search(line)
                 a = match.group(1)
                 # history
@@ -41,14 +49,6 @@ def srcparse(source):
                         switch = 2
                     a = 'h' + a
                 links[a] = match.group(2)
-            # check for pickup song match
-            elif wvrpkp.search(line):
-                match = wvrpkp.search(line)
-                links['pkp'] = match.group(1)
-            # check for ed song match
-            elif wvred.search(line):
-                match = wvred.search(line)
-                links['ed'] = match.group(1)
             # check for history
             elif switch == 0:
                 # if the line is not a song, check to see if the history
