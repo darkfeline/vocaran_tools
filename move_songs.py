@@ -99,10 +99,12 @@ def process(file):
         # For synonymous vocaloid names, use first element in list
         if isinstance(guess, list):
             guess = guess[0]
+    elif len(imatch) > 1:
+        guess = ""
     else:
         guess = None
 
-    if not guess:
+    if guess == None:
         print("Couldn't guess directory")
         for i, n in enumerate(VOCALOIDS):
             if isinstance(n, list):
