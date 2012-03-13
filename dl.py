@@ -240,7 +240,7 @@ def dlloop(dlf, fields, filename, optlist):
                         print('URLError: retrying...')
                         continue
                     else:
-                        save_session(sessionfile, i)
+                        save_session(sessionfile, filename, i + j)
                         print('URLError: exiting...')
                         sys.exit()
             else:
