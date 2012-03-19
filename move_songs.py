@@ -84,6 +84,7 @@ def process(file):
         else:
             print('Continuing ({} may be corrupt)'.format(file))
 
+    # guess file (in guess)
     imatch = []
     for i, p in enumerate(PVOCALOIDS):
         if isinstance(p, list):
@@ -105,86 +106,101 @@ def process(file):
     else:
         guess = None
 
-    if guess == None:
-        print("Couldn't guess directory")
-        for i, n in enumerate(VOCALOIDS):
-            if isinstance(n, list):
-                n = n[0]
-            print(str(i) + " " + n)
-        print("r base directory: " + ROOT)
-        print("s skip")
-        i = input("destination?")
-        if i.lower() == "r":
-            guess = ""
-        elif i.lower() == "s":
-            print("Skipping")
-            return
-        else:
-            i = int(i)
-            if not 0 <= i < len(VOCALOIDS):
-                print(i + ": Not a valid input: Skipping")
-                return
-            guess = VOCALOIDS[i]
-            # For synonymous vocaloid names, use first element in list
-            if isinstance(guess, list):
-                guess = guess[0]
-
     oldp = os.path.join(os.getcwd(), file)
-    newp = os.path.join(ROOT, guess)
-
-    print("From: " + oldp)
-    print("To: " + newp)
-    i = input("[y]/n? ").lower()
-    if i in ("y", "yes", ""):
-        # Deal with if file already exists
-        print()
-        if os.path.isdir(os.path.join(newp, file)):
-            print("{} is a directory; skipping".format(os.path.join(newp,
-                                                                    file)))
-        elif os.path.isfile(os.path.join(newp, file)):
-            print("{} exists. Replace?".format(os.path.join(newp, file)))
-
-            tag = stagger.read_tag(os.path.join(newp, file))
-            title = tag.title
-            artist = tag.artist
-            length = int(subprocess.check_output(['mp3info', '-p', '%S',
-                                                  os.path.join(newp, file)]))
-            length = '{:02}:{:02}:{:02}'.format(
-                length // 3600, length % 3600 // 60, length % 3600 % 60)
-            length = length.lstrip('0:')
-            mtime = time.strftime("%a, %d %b %Y %H:%M:%S +0000",
-                      time.gmtime(os.path.getmtime(os.path.join(newp, file))))
-            template = "Old:\nTitle:{title}\nArtist:{artist}\nLength:{length}\
-                    \nmtime:{mtime}"
-            print(template.format(title=title, artist=artist, length=length,
-                                  mtime=mtime))
-
-            tag = stagger.read_tag(oldp)
-            title = tag.title
-            artist = tag.artist
-            length = int(subprocess.check_output(['mp3info', '-p', '%S',
-                                                  oldp]))
-            length = '{:02}:{:02}:{:02}'.format(
-                length // 3600, length % 3600 // 60, length % 3600 % 60)
-            length = length.lstrip('0:')
-            mtime = time.strftime("%a, %d %b %Y %H:%M:%S +0000",
-                      time.gmtime(os.path.getmtime(oldp)))
-            print(template.format(title=title, artist=artist, length=length,
-                                  mtime=mtime))
-
-            i = input("[y]/n? ").lower()
-            if i in ("y", "yes", ""):
-                os.rename(oldp, os.path.join(newp, file))
-                print("Overwritten")
-            else:
+    # loop for input
+    while True:
+        if guess == None:
+            print("Couldn't guess directory")
+            i = input("[s]/c/t? ").lower()
+            if i == "":
                 print("Skipping")
-                return
+                break
         else:
-            shutil.move(oldp, newp)
-            print("Moved")
+            newp = os.path.join(ROOT, guess)
+            print("From: " + oldp)
+            print("To: " + newp)
+            i = input("[y]/n/c/t? ").lower()
+            if i in ("y", ""):
+                move(oldp, newp, file)
+                break
+            elif i == "n":
+                print("Skipping")
+                break
+        if i == "c":
+            for i, n in enumerate(VOCALOIDS):
+                if isinstance(n, list):
+                    n = n[0]
+                print(str(i) + " " + n)
+            print("r base directory: " + ROOT)
+            print("c cancel")
+            i = input("destination?")
+            if i.lower() == "r":
+                guess = ""
+            elif i.lower() == "c":
+                print("Canceling")
+                continue
+            else:
+                i = int(i)
+                if not 0 <= i < len(VOCALOIDS):
+                    print(i + ": Not a valid input: Canceling")
+                    continue
+                guess = VOCALOIDS[i]
+                # For synonymous vocaloid names, use first element in list
+                if isinstance(guess, list):
+                    guess = guess[0]
+        elif i == "t":
+            print("Manually type directory")
+            guess = input(ROOT + "/")
+
+def move(oldp, newp, file):
+    print()
+    if os.path.isdir(os.path.join(newp, file)):
+        print("{} is a directory; skipping".format(os.path.join(newp,
+                                                                file)))
+        return 1
+    elif os.path.isfile(os.path.join(newp, file)):
+        print("{} exists. Replace?".format(os.path.join(newp, file)))
+
+        tag = stagger.read_tag(os.path.join(newp, file))
+        title = tag.title
+        artist = tag.artist
+        length = int(subprocess.check_output(['mp3info', '-p', '%S',
+                                              os.path.join(newp, file)]))
+        length = '{:02}:{:02}:{:02}'.format(
+            length // 3600, length % 3600 // 60, length % 3600 % 60)
+        length = length.lstrip('0:')
+        mtime = time.strftime("%a, %d %b %Y %H:%M:%S +0000",
+                  time.gmtime(os.path.getmtime(os.path.join(newp, file))))
+        template = "Old:\nTitle:{title}\nArtist:{artist}\nLength:{length}\
+                \nmtime:{mtime}"
+        print(template.format(title=title, artist=artist, length=length,
+                              mtime=mtime))
+
+        tag = stagger.read_tag(oldp)
+        title = tag.title
+        artist = tag.artist
+        length = int(subprocess.check_output(['mp3info', '-p', '%S',
+                                              oldp]))
+        length = '{:02}:{:02}:{:02}'.format(
+            length // 3600, length % 3600 // 60, length % 3600 % 60)
+        length = length.lstrip('0:')
+        mtime = time.strftime("%a, %d %b %Y %H:%M:%S +0000",
+                  time.gmtime(os.path.getmtime(oldp)))
+        print(template.format(title=title, artist=artist, length=length,
+                              mtime=mtime))
+
+        i = input("[y]/n? ").lower()
+        if i in ("y", "yes", ""):
+            os.rename(oldp, os.path.join(newp, file))
+            print("Overwritten")
+            return 0
+        else:
+            print("Skipping")
+            return 1
     else:
-        print("Skipping")
-        return
+        shutil.move(oldp, newp)
+        print("Moved")
+        return 0
 
 if __name__ == '__main__':
     main()
