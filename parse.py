@@ -5,17 +5,19 @@ import re
 SEP = "::"
 NNDID = '[sn][mo][0-9]+'
 
-def srcparse(source):
-    """Returns a dict with song rank keys mapped to corresponding NND IDs using
-    the html source from Vocaloidism.
-        
-    The source should be the path to a file containing the html source of the
-    ranking section on the relevant Vocaloidism page.  srcparse scanes the
-    source and returns a dict where the key is a string which contains the rank
-    number of a song, with or without an 'h' prepended (the 'h' is present for
-    songs in the history section), 'pkp' or 'ed'.  The items each key refers to
-    is a string containing the NND ID (e.g. sm123456789 or nm123456789) of that
-    song.
+def parse_vocaloidism(source):
+    """Return a dict with song ranks from Vocaloidism.
+    
+    source should be the path to a file containing the html source of the
+    relevant Vocaloidism weekly ranking page.  parse_vocaloidism() scans the
+    source and returns a dict with the following format:
+
+    {'rank number':'sm123456789',
+    'h5':'nm123456789',
+    'pkp':'sm1',
+    'ed':'sm2',
+    '13',:sm3', ...
+    }
 
     """
     wvr = re.compile(r'<strong>.*?([0-9]+).*?www\.nicovideo\.jp/watch/' +
@@ -49,42 +51,36 @@ def srcparse(source):
                         switch = 2
                     a = 'h' + a
                 links[a] = match.group(2)
-            # check for history
+            # check for start of history section
             elif switch == 0:
-                # if the line is not a song, check to see if the history
-                # section is starting
                 match = wvrhis.search(line)
                 if match:
                     switch = 1
     return links
 
 def checklinks(links):
-    """Checks if the links returned from srcparse() is complete or not.
-    Returns a set of expected keys that are missing."""
+    """Check the return value of parse_vocaloidism() for completeness.
+
+    Return a set of expected keys that are missing.  Expected keys are '1' to
+    '30', 'h1' to 'h5', 'pkp' and 'ed'.
+    
+    """
     given = set(links)
     expected = set([str(i) for i in range(1,31)] + 
                    ['h{}'.format(i) for i in range(1,6)] + ['pkp', 'ed'])
     return expected - given
 
-def lsparse(lst, links):
-    """Returns a list with all args needed to dl custom mp3 from nicomimi.
-    
-    [
-        [id, song_name, artist, album, comment, albumart],
-        .
-        .
-        .
-    ]
+def convert_list(lst, links):
+    """Convert the song list with ranks into an argument list.
 
-    lst is the name of a file with the following syntax: 
-        Each line has 6 fields, separated with the globally defined string SEP.
-        The first field is either one of the keys in links generated from
-        srcparse (i.e. rank number, with or without an 'h' prepended, 'pkp' or
-        'ed') or a raw NND ID.  The rest of the fields are song name, artist,
-        album, comment, albumart.  e.g.
-        rank_no|id::song_name::artist::album::comment::albumart
+    Return a list with the following format:
+    [[id, song_name, artist, album, comment, albumart], ... ]
 
-    links is the return list from srcparse()
+    lst is the name of a file with the following syntax, with default SEP '::':
+    id::song_name[::artist[::album[::comment[::albumart]]]]
+    id ~= [sn][mo][0-9]+|h?[0-9]+|pkp|ed
+
+    links is the list returned by parse_vocaloidism()
 
     """
     # regex magic follows
@@ -113,23 +109,14 @@ def lsparse(lst, links):
                            match.group(5), match.group(6)][:len(c) + 1])
     return fields
 
-def parse(lst):
-    """Returns a list with all args needed to dl custom mp3 from nicomimi.
+def parse_list(lst):
+    """Parse a song list with ids into an argument list.
     
-    [
-        [id, song_name, artist, album, comment, albumart],
-        .
-        .
-        .
-    ]
+    [[id, song_name, artist, album, comment, albumart], ... ]
 
-    lst is the name of a file with the following syntax: 
-        Each line has 6 fields, separated with the globally defined string SEP.
-        The first field is either one of the keys in links generated from
-        srcparse (i.e. rank number, with or without an 'h' prepended or 'ed')
-        or a raw NND ID.  The rest of the fields are song name, artist, album,
-        comment, albumart.  e.g.
-        id::song_name::artist::album::comment::albumart
+    lst is the name of a file with the following syntax, with default SEP '::':
+    id::song_name[::artist[::album[::comment[::albumart]]]]
+    id ~= [sn][mo][0-9]+|h?[0-9]+|pkp|ed
 
     """
     # regex magic follows
@@ -164,15 +151,15 @@ def main(number, lst, out):
         print('Getting Vocaloid HTML for week {}...'.format(number))
         number = int(number)
         src = 'src.tmp'
-        dl.getsrc(src, number)
+        dl.get_vocaloidism(src, number)
     print('parsing src...')
-    ranks = srcparse(src)
+    ranks = parse_vocaloidism(src)
     print('checking parsed links...')
     if checklinks(ranks):
-        raise Exception('srcparse links is incomplete.  Check src and/or \
-                        srcparse', checklinks(ranks))
+        raise Exception('parse_vocaloidism links is incomplete.  Check src and/or \
+                        parse_vocaloidism', checklinks(ranks))
     print('parsing rank...')
-    fields = lsparse(lst, ranks)
+    fields = convert_list(lst, ranks)
     print('appending to lst...')
     with open(out, 'a') as f:
         for item in fields:
