@@ -14,8 +14,6 @@ import sys
 import stagger
 from stagger.id3 import *
 
-import parse
-
 def dl(file, id, title, artist, album='', comment='', apic='def'):
     """Request a custom MP3 from nicomimi.net
 
@@ -98,7 +96,7 @@ def dl3(file, id, title, artist, album='', comment='', apic='def'):
     conn.close()
     tag(file, id, title, artist, album, comment, apic)
 
-def tag(file, id, title, artist, album='', comment='', apic='def'):
+def tag(file, id, title='', artist='', album='', comment='', apic='def'):
     """Tag the MP3 file using stagger.  
     
     comment is tagged as COMM, as opposed to USLT that nicomimi.net custom uses
@@ -176,14 +174,16 @@ def save_session(sessionfile, filename, i):
                 g.read().encode('UTF-8')).hexdigest() + "\n")
             f.write(str(i))
 
-def dlloop(dlf, fields, filename, optlist):
-    """Loops a dl function over fields.  Prints output for convenience.  Also
-    handles pause/restore session.  file name illegal char handling is here
-    ('/' replaced with '|')
-    
-    fields as returned from lsparse.  dlf is the dl function to use.  filename
-    is name of file (to generate session dat file).  optlist is list of
-    arguments.
+def dlloop(dlf, fields, filename, force=False):
+    """Loop the dl function over fields.
+
+    Prints output for convenience.  Also handle pause/restore session.  File
+    name illegal char handling is here ('/' replaced with '|')
+
+    fields as returned from lsparse.
+    dlf is the dl function to use.
+    filename is name of file (to generate session dat file).
+    force is boolean for whether to retry downloads on timeout.
 
     """
     re_illegal = re.compile(r'/')
@@ -212,7 +212,7 @@ def dlloop(dlf, fields, filename, optlist):
                 sys.exit()
             except urllib.error.URLError as e:
                 if re_error.search(str(e)):
-                    if '-f' in [opt[0] for opt in optlist]:
+                    if force:
                         print('URLError: retrying...')
                         continue
                     else:
@@ -226,12 +226,16 @@ def dlloop(dlf, fields, filename, optlist):
     if os.path.isfile(sessionfile):
         os.remove(sessionfile)
 
-def main(lst, optlist):
+def dlmain(lst, optlist):
     """main function.  Parses file, adds empty fields, then passes on to dlloop
 
-    lst is name of file optlist is list of arguments
+    lst is name of file.
+    optlist is list of arguments.
 
     """
+
+    import parse
+
     print('Parsing lst...')
     fields = parse.parse_list(lst)
     # set comment field to id if it doesn't exist
@@ -240,13 +244,11 @@ def main(lst, optlist):
             for i in range(4 - len(x)):
                 x.append('')
             x.append(x[0])
+    args = []
+    if '-f' in optlist:
+        args.append(True)
+    else:
+        args.append(False)
     print('Downloading...')
-    dlloop(dl2, fields, lst, optlist)
+    dlloop(dl2, fields, lst, *args)
     print('Done.')
-
-if __name__ == '__main__':
-    import sys
-
-    optlist, args = getopt.getopt(sys.argv[1:], 'f')
-    lst = args[0]
-    main(lst, optlist)
