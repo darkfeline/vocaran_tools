@@ -14,7 +14,7 @@ import sys
 import stagger
 from stagger.id3 import *
 
-def dl(file, id, title, artist, album='', comment='', apic='def'):
+def dl(file, id, title='', artist='', album='', comment='', apic='def'):
     """Request a custom MP3 from nicomimi.net
 
     file should probably match the title and end in '.mp3' as the right
@@ -48,7 +48,7 @@ def dl(file, id, title, artist, album='', comment='', apic='def'):
         f.write(data)
     conn.close()
 
-def dl2(file, id, title, artist, album='', comment='', apic='def'):
+def dl2(file, id, title='', artist='', album='', comment='', apic='def'):
     """Request an MP3 download from nicomimi.net, then tags file using stagger.
 
     file should probably match title and end in '.mp3' as the right extension.
@@ -71,7 +71,7 @@ def dl2(file, id, title, artist, album='', comment='', apic='def'):
     tag(file, id, title, artist, album, comment, apic)
 
 # TODO doesn't work yet 
-def dl3(file, id, title, artist, album='', comment='', apic='def'):
+def dl3(file, id, title='', artist='', album='', comment='', apic='def'):
     """dl from nicosound, tagged with tag() (stagger)"""
     cj = http.cookiejar.CookieJar()
     opener = urllib.request.build_opener(
@@ -180,9 +180,9 @@ def dlloop(dlf, fields, filename, force=False):
     Prints output for convenience.  Also handle pause/restore session.  File
     name illegal char handling is here ('/' replaced with '|')
 
-    fields as returned from lsparse.
+    fields is the song list.
     dlf is the dl function to use.
-    filename is name of file (to generate session dat file).
+    filename is the name of the song list file (to generate session dat file).
     force is boolean for whether to retry downloads on timeout.
 
     """
@@ -226,29 +226,27 @@ def dlloop(dlf, fields, filename, force=False):
     if os.path.isfile(sessionfile):
         os.remove(sessionfile)
 
-def dlmain(lst, optlist):
-    """main function.  Parses file, adds empty fields, then passes on to dlloop
+def dlmain(filename, optlist):
+    """Parse file, add empty fields, then pass on to dlloop
 
-    lst is name of file.
+    filename is name of song list file.
     optlist is list of arguments.
 
     """
 
     import parse
 
-    print('Parsing lst...')
-    fields = parse.parse_list(lst)
-    # set comment field to id if it doesn't exist
+    print('Parsing file...')
+    fields = parse.parse_list(filename)
+    # set comment field to id if it's blank
     for x in fields:
-        if len(x) < 5:
-            for i in range(4 - len(x)):
-                x.append('')
-            x.append(x[0])
+        if x[5] == '':
+            x[5] = x[0]
     args = []
     if '-f' in optlist:
         args.append(True)
     else:
         args.append(False)
     print('Downloading...')
-    dlloop(dl2, fields, lst, *args)
+    dlloop(dl2, fields, filename, *args)
     print('Done.')

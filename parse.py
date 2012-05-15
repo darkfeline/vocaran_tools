@@ -6,18 +6,10 @@ SEP = "::"
 NNDID = '[sn][mo][0-9]+'
 
 def parse_vocaloidism(source):
-    """Return a dict with song ranks from Vocaloidism.
+    """Return a song rank dict parsed from Vocaloidism ranking page.
     
     source should be the path to a file containing the html source of the
-    relevant Vocaloidism weekly ranking page.  parse_vocaloidism() scans the
-    source and returns a dict with the following format:
-
-    {'rank number':'sm123456789',
-    'h5':'nm123456789',
-    'pkp':'sm1',
-    'ed':'sm2',
-    '13',:sm3', ...
-    }
+    relevant Vocaloidism weekly ranking page.
 
     """
     wvr = re.compile(r'<strong>.*?([0-9]+).*?www\.nicovideo\.jp/watch/' +
@@ -27,18 +19,18 @@ def parse_vocaloidism(source):
                         '({})'.format(NNDID), re.I)
     wvred = re.compile(r'ED Song.*?www\.nicovideo\.jp/watch/' +
                        '({})'.format(NNDID), re.I)
-    links = {}
+    song_ranks = {}
     switch = 0
     with open(source) as src:
         for line in src:
             # check for pickup song match
             if wvrpkp.search(line):
                 match = wvrpkp.search(line)
-                links['pkp'] = match.group(1)
+                song_ranks['pkp'] = match.group(1)
             # check for ed song match
             elif wvred.search(line):
                 match = wvred.search(line)
-                links['ed'] = match.group(1)
+                song_ranks['ed'] = match.group(1)
             # scan line for song
             elif wvr.search(line):
                 match = wvr.search(line)
@@ -50,39 +42,28 @@ def parse_vocaloidism(source):
                     if a == "1":
                         switch = 2
                     a = 'h' + a
-                links[a] = match.group(2)
+                song_ranks[a] = match.group(2)
             # check for start of history section
             elif switch == 0:
                 match = wvrhis.search(line)
                 if match:
                     switch = 1
-    return links
+    return song_ranks
 
-def checklinks(links):
-    """Check the return value of parse_vocaloidism() for completeness.
+def checklinks(song_ranks):
+    """Check the song rank dict for completeness.
 
     Return a set of expected keys that are missing.  Expected keys are '1' to
     '30', 'h1' to 'h5', 'pkp' and 'ed'.
     
     """
-    given = set(links)
+    given = set(song_ranks)
     expected = set([str(i) for i in range(1,31)] + 
                    ['h{}'.format(i) for i in range(1,6)] + ['pkp', 'ed'])
     return expected - given
 
-def convert_list(lst, links):
-    """Convert the song list with ranks into an argument list.
-
-    Return a list with the following format:
-    [[id, song_name, artist, album, comment, albumart], ... ]
-
-    lst is the name of a file with the following syntax, with default SEP '::':
-    id::song_name[::artist[::album[::comment[::albumart]]]]
-    id ~= [sn][mo][0-9]+|h?[0-9]+|pkp|ed
-
-    links is the list returned by parse_vocaloidism()
-
-    """
+def convert_list(filename, song_ranks):
+    """Convert the song list file with ranks into a song list."""
     # regex magic follows
     sepm = r'(?:{})'.format(SEP)
     tail = sepm.join(r'(.*?)' for x in range(5))
@@ -91,34 +72,26 @@ def convert_list(lst, links):
     s = re.compile(SEP)
 
     fields = []
-    with open(lst) as src:
+    with open(filename) as src:
         for line in src:
             c = s.findall(line)
             line = line.rstrip() + SEP * (5 - len(c))
             match = rank.search(line)
             if match:
-                id = links[match.group(1).lower()]
+                id = song_ranks[match.group(1).lower()]
             else:
                 match = idm.search(line)
                 if match:
                     id = match.group(1).lower()
             if not match:
                 raise Exception("Error when parsing {file}: {line}".format(
-                    file=lst, line=line))
+                    file=filename, line=line))
             fields.append([id, match.group(2), match.group(3), match.group(4),
-                           match.group(5), match.group(6)][:len(c) + 1])
+                           match.group(5), match.group(6)])
     return fields
 
-def parse_list(lst):
-    """Parse a song list with ids into an argument list.
-    
-    [[id, song_name, artist, album, comment, albumart], ... ]
-
-    lst is the name of a file with the following syntax, with default SEP '::':
-    id::song_name[::artist[::album[::comment[::albumart]]]]
-    id ~= [sn][mo][0-9]+|h?[0-9]+|pkp|ed
-
-    """
+def parse_list(filename):
+    """Parse a song list file and return a song list."""
     # regex magic follows
     sep = r'(?:{})'.format(SEP)
     idp = re.compile(sep.join([r'^(?P<id>{})'.format(NNDID), r'(?P<title>.*?)',
@@ -128,16 +101,17 @@ def parse_list(lst):
     s = re.compile(SEP)
 
     fields = []
-    with open(lst) as src:
+    with open(filename) as src:
         for line in src:
-            c = s.findall(line) # number of SEPs in line
+            # pad out SEPs
+            c = s.findall(line)
             line = line.rstrip() + SEP * (5 - len(c))
 
             match = idp.search(line)
             if match:
                 g = match.group
                 fields.append([g('id'), g('title'), g('artist'), g('album'),
-                               g('comment'), g('albumart')][:len(c) + 1])
+                               g('comment'), g('albumart')])
     return fields
 
 def main(number, lst, out):

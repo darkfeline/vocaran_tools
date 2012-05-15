@@ -15,8 +15,68 @@ use your distro's package manager.
 
 .. _mp3info: http://www.ibiblio.org/mp3info/
 
+Specifications
+--------------
+
+File formats
+````````````
+
+All files are plain text.
+
+Song list files contain one song entry per line::
+
+    song_entry ::= NND_id SEP song_name [SEP artist [SEP album [SEP comment
+                   [SEP apic]]]]
+    SEP ::= '::'
+    NND_id ::= ('s' | 'n') ('m' | 'o') ('0' ... '9')+
+    song_name ::= <any string that doesn't contain SEP>
+    artist ::= <any string that doesn't contain SEP>
+    album ::= <any string that doesn't contain SEP>
+    comment ::= <any string that doesn't contain SEP>
+    apic ::= 'none' | 'def' | <arbitrary set of strings of integers, e.g. '1',
+             '2', '3' ...>
+
+- SEP can be changed in parse.py.
+- apic refers to albumart retrieved from nicomimi.net
+
+Song list files with ranks also take ranks in song entries::
+
+    song_entry_with_ranks ::= NND_id_with_rank SEP song_name [ SEP artist [ SEP
+                              album [ SEP comment [ SEP albumart ] ] ] ]
+    NND_id_with_rank ::= NND_id | ['h'] ('0' .. '9')+ | 'pkp' | 'ed'
+
+- The ranks must correspond to a single weekly Vocaran's rankings.
+- Where song list files with ranks are allowed, "with ranks" must be explicitly
+  stated.
+
+Data models
+```````````
+
+Song rank dictionaries map rankings to NND ids.  They have the following
+format::
+
+    {'rank number':'sm123456789',
+    'h5':'nm123456789',
+    'pkp':'sm1',
+    'ed':'sm2',
+    '13',:sm3', ...
+    }
+
+Song lists are list representations of song list files.  They have the
+following format::
+
+    [[id, song_name, artist, album, comment, apic], ... ]
+
+- There are also song lists with ranks that represent song list files with
+  ranks.
+- Where song lists with ranks are allowed, "with ranks" must be explicitly
+  stated.
+
+Modules
+-------
+
 dl.py
------
+`````
 
 dl.py facilitates bulk downloading of Nico Nico Douga (NND) songs through
 nicomimi.net.  It no longer translates rank numbers into NNDIDs; this
@@ -53,7 +113,7 @@ per line in the following format::
     SEP = "@@"
 
 dl functions
-````````````
+''''''''''''
 
 dl.py contains various dl functions which are passed to dlloop to use to
 download the songs.  Read the docstrings for the functions for details on each.
@@ -69,7 +129,7 @@ name created in the current directory which is the MP3 of the corresponding
 video on Nico Nico Douga, and tagged accordingly.  
 
 parse.py
---------
+````````
 
 parse.py provides any parsing tools necessary for vocaran_tools.  It is also a
 runnable script which processes rank information translation to NND id numbers.
@@ -88,7 +148,7 @@ number can either be the week number, or the name of a file containing the HTML
 source downloaded from the respective Vocaloidism page.
 
 move_songs.py
--------------
+`````````````
 
 move_songs.py automates moving downloaded songs into your music directory.
 Edit move_songs.py and change::
