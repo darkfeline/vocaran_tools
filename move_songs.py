@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 
-# move_songs.py
-# 
-# moves vocaloid songs according to artist tag
+"""
+move_songs.py
+
+moves vocaloid songs according to artist tag
+
+"""
 
 
 import os
@@ -71,7 +74,9 @@ def move_main():
         process(f)
 
 def process(file):
+
     """Move file interactively."""
+
     tag = stagger.read_tag(file)
     title = tag.title
     artist = tag.artist
@@ -160,6 +165,7 @@ def process(file):
             guess = input(ROOT + "/")
 
 def move(oldp, newp, file):
+
     print()
     if os.path.isdir(os.path.join(newp, file)):
         print("{} is a directory; skipping".format(os.path.join(newp,

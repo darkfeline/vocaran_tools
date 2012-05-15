@@ -35,10 +35,8 @@ def dl(file, id, title='', artist='', album='', comment='', apic='def'):
                                      'TALB' : album,
                                      'USLT' : comment})
     params = params.encode('utf-8')
-
     conn = urllib.request.urlopen(
         'http://media3.nicomimi.net/customplay.rb', params)
-
     data = conn.read()
     with open(file, 'wb') as f:
         f.write(data)
@@ -58,7 +56,6 @@ def dl2(file, id, title='', artist='', album='', comment='', apic='def'):
         urllib.request.HTTPCookieProcessor(cj))
     conn = opener.open('http://www.nicomimi.net/play/{}'.format(id))
     conn.close()
-
     conn = opener.open('http://media2.nicomimi.net/get?vid={}'.format(id)) 
     data = conn.read()
     with open(file, 'wb') as f:
@@ -75,7 +72,6 @@ def dl3(file, id, title='', artist='', album='', comment='', apic='def'):
     conn = opener.open("http://nicosound.anyap.info/sound/{}".format(id))
     html = conn.read()
     conn.close()
-
     params = urllib.parse.urlencode({'__EVENTTARGET' : eventtarget,
                                      '__EVENTARGUMENT' : eventargument,
                                      '__VIEWSTATE' : viewstate,
@@ -85,7 +81,6 @@ def dl3(file, id, title='', artist='', album='', comment='', apic='def'):
 
     conn = opener.open("http://nicosound.anyap.info/sound/{}".format(id),
                        params)
-
     data = conn.read()
     with open(file, 'wb') as f:
         f.write(data)
@@ -105,7 +100,6 @@ def tag(file, id, title='', artist='', album='', comment='', apic='def'):
     """
     # get pic
     getpic(file + '.jpg', id, apic)
-
     t = stagger.default_tag()
     t._filename = file
     t[TIT2] = title
@@ -114,7 +108,6 @@ def tag(file, id, title='', artist='', album='', comment='', apic='def'):
     t[USLT] = USLT(text=comment)
     t[APIC] = APIC(file + '.jpg')
     t.write()
-
     # remove pic
     os.remove(file + '.jpg')
 
@@ -126,7 +119,6 @@ def getpic(file, id, apic='def'):
             param = '?aw=' + int(apic)
     except ValueError:
         pass
-
     conn = urllib.request.urlopen(
         'http://www.nicomimi.net/thumbnail/{}{}'.format(id, param))
     data = conn.read()
@@ -171,6 +163,7 @@ def save_session(sessionfile, filename, i):
             f.write(str(i))
 
 def main(*args):
+
     import argparse
 
     parser = argparse.ArgumentParser(description='dl.py')
@@ -185,6 +178,7 @@ def main(*args):
         sys.exit()
 
 def dlmain(filename, *args):
+
     """Parse song list file and pass on to dlloop
 
     filename is name of song list file.
@@ -215,6 +209,7 @@ def dlmain(filename, *args):
     print('Done.')
 
 def dlloop(dlf, fields, filename, force=False):
+
     """Loop the dl function over fields.
 
     Prints output for convenience.  Also handle pause/restore session.  File
@@ -226,7 +221,9 @@ def dlloop(dlf, fields, filename, force=False):
     force is boolean for whether to retry downloads on timeout.
 
     """
+
     import re
+
     re_illegal = re.compile(r'/')
     re_error = re.compile(r'[Errno 110]')
     sessionfile= '.' + filename + '.dl.py.dat'
@@ -267,8 +264,10 @@ def dlloop(dlf, fields, filename, force=False):
     if os.path.isfile(sessionfile):
         os.remove(sessionfile)
 
+
 class QuitException(Exception):
     pass
+
 
 if __name__ == "__main__":
     import sys

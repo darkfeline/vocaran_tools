@@ -63,7 +63,9 @@ def checklinks(song_ranks):
     return expected - given
 
 def convert_list(filename, song_ranks):
+
     """Convert the song list file with ranks into a song list."""
+
     # regex magic follows
     sepm = r'(?:{})'.format(SEP)
     tail = sepm.join(r'(.*?)' for x in range(5))
@@ -91,7 +93,9 @@ def convert_list(filename, song_ranks):
     return fields
 
 def parse_list(filename):
+
     """Parse a song list file and return a song list."""
+
     # regex magic follows
     sep = r'(?:{})'.format(SEP)
     idp = re.compile(sep.join([r'^(?P<id>{})'.format(NNDID), r'(?P<title>.*?)',
@@ -115,6 +119,7 @@ def parse_list(filename):
     return fields
 
 def main(*args):
+
     import argparse
 
     parser = argparse.ArgumentParser(description='parse.py')
@@ -126,6 +131,7 @@ def main(*args):
     parse_main(args.source, args.list_file, args.out_file)
 
 def parse_main(source, list_file, out_file):
+
     import os
     import dl
 
