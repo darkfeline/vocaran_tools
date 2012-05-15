@@ -1,15 +1,11 @@
 #!/usr/bin/env python3
 
 import os
-import re
 import urllib.parse
 import urllib.request
 import urllib.error
 import http.cookiejar
-import subprocess
 import hashlib
-import getopt
-import sys
 
 import stagger
 from stagger.id3 import *
@@ -174,6 +170,50 @@ def save_session(sessionfile, filename, i):
                 g.read().encode('UTF-8')).hexdigest() + "\n")
             f.write(str(i))
 
+def main(*args):
+    import argparse
+
+    parser = argparse.ArgumentParser(description='dl.py')
+    parser.add_argument('-f', dest='force', action='store_true', default=False)
+    parser.add_argument('file')
+    args = parse.parse_args(args)
+
+    try:
+        dlmain(args.file, args.force)
+    except QuitException:
+        import sys
+        sys.exit()
+
+def dlmain(filename, *args):
+    """Parse song list file and pass on to dlloop
+
+    filename is name of song list file.
+    args is passed directly to dlloop().
+
+    dlmain() sets comment field to id if it's blank.
+
+    """
+
+    import parse
+
+    print('Parsing file...')
+    fields = parse.parse_list(filename)
+    # set comment field to id if it's blank
+    for x in fields:
+        if x[5] == '':
+            x[5] = x[0]
+    args = []
+    if '-f' in optlist:
+        args.append(True)
+    else:
+        args.append(False)
+    print('Downloading...')
+    try:
+        dlloop(dl2, fields, filename, *args)
+    except QuitException as e:
+        raise e
+    print('Done.')
+
 def dlloop(dlf, fields, filename, force=False):
     """Loop the dl function over fields.
 
@@ -186,6 +226,7 @@ def dlloop(dlf, fields, filename, force=False):
     force is boolean for whether to retry downloads on timeout.
 
     """
+    import re
     re_illegal = re.compile(r'/')
     re_error = re.compile(r'[Errno 110]')
     sessionfile= '.' + filename + '.dl.py.dat'
@@ -209,7 +250,7 @@ def dlloop(dlf, fields, filename, force=False):
                 if 'i' in locals():
                     print('Writing current session...')
                     save_session(sessionfile, filename, i + j)
-                sys.exit()
+                raise QuitException()
             except urllib.error.URLError as e:
                 if re_error.search(str(e)):
                     if force:
@@ -218,7 +259,7 @@ def dlloop(dlf, fields, filename, force=False):
                     else:
                         save_session(sessionfile, filename, i + j)
                         print('URLError: exiting...')
-                        sys.exit()
+                        raise QuitException()
             else:
                 break
         print("Finished {} ({}/{})".format(
@@ -226,27 +267,9 @@ def dlloop(dlf, fields, filename, force=False):
     if os.path.isfile(sessionfile):
         os.remove(sessionfile)
 
-def dlmain(filename, optlist):
-    """Parse file, add empty fields, then pass on to dlloop
+class QuitException(Exception):
+    pass
 
-    filename is name of song list file.
-    optlist is list of arguments.
-
-    """
-
-    import parse
-
-    print('Parsing file...')
-    fields = parse.parse_list(filename)
-    # set comment field to id if it's blank
-    for x in fields:
-        if x[5] == '':
-            x[5] = x[0]
-    args = []
-    if '-f' in optlist:
-        args.append(True)
-    else:
-        args.append(False)
-    print('Downloading...')
-    dlloop(dl2, fields, filename, *args)
-    print('Done.')
+if __name__ == "__main__":
+    import sys
+    main(*sys.argv[1:])

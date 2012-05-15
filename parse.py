@@ -114,18 +114,29 @@ def parse_list(filename):
                                g('comment'), g('albumart')])
     return fields
 
-def main(number, lst, out):
+def main(*args):
+    import argparse
+
+    parser = argparse.ArgumentParser(description='parse.py')
+    parser.add_argument('source')
+    parser.add_argument('list_file')
+    parser.add_argument('out_file')
+    args = parser.parse_args(args)
+
+    parse_main(args.source, args.list_file, args.out_file)
+
+def parse_main(source, list_file, out_file):
     import os
     import dl
 
-    if os.path.isfile(number):
-        print('{} is a file; using as src'.format(number))
-        src = number
+    if os.path.isfile(source):
+        print('{} is a file; using as src'.format(source))
+        src = source
     else:
-        print('Getting Vocaloid HTML for week {}...'.format(number))
-        number = int(number)
+        print('Getting Vocaloid HTML for week {}...'.format(source))
+        source = int(source)
         src = 'src.tmp'
-        dl.get_vocaloidism(src, number)
+        dl.get_vocaloidism(src, source)
     print('parsing src...')
     ranks = parse_vocaloidism(src)
     print('checking parsed links...')
@@ -133,9 +144,9 @@ def main(number, lst, out):
         raise Exception('parse_vocaloidism links is incomplete.  Check src and/or \
                         parse_vocaloidism', checklinks(ranks))
     print('parsing rank...')
-    fields = convert_list(lst, ranks)
-    print('appending to lst...')
-    with open(out, 'a') as f:
+    fields = convert_list(list_file, ranks)
+    print('appending to list_file...')
+    with open(out_file, 'a') as f:
         for item in fields:
             line = ""
             for x in item:
@@ -151,9 +162,4 @@ def main(number, lst, out):
 
 if __name__ == '__main__':
     import sys
-
-    number = sys.argv[1]
-    lst = sys.argv[2]
-    out = sys.argv[3]
-
-    main(number, lst, out)
+    main(*sys.argv[1:])
