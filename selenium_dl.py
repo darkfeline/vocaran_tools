@@ -66,18 +66,8 @@ def dl(id, name):
 
     driver = webdriver.Firefox(firefox_profile=fp)
     driver.implicitly_wait(30)
-    base_url = "http://nicosound.anyap.info/"
-    driver.get(base_url)
-
-    x = driver.find_element_by_id("ctl00_Header1_VideoConvertingBox1_txtUrl")
-    x.clear()
-
-    x = driver.find_element_by_id("ctl00_Header1_VideoConvertingBox1_txtUrl")
-    x.send_keys(id)
-
-    x = driver.find_element_by_id(
-            "ctl00_Header1_VideoConvertingBox1_btnConvertMp3")
-    x.click()
+    base_url = "http://nicosound.anyap.info/sound/{}"
+    driver.get(base_url.format(id))
 
     try:
         x = driver.find_element_by_id(
@@ -91,6 +81,8 @@ def dl(id, name):
             f.close()
         shutil.rmtree(TMPDIR)
         return 1
+
+    driver.get('chrome://mozapps/content/downloads/downloads.xul')
 
     while 1:
         time.sleep(2)
@@ -120,7 +112,10 @@ def main(*args):
     parser.add_argument('filename')
     args = parser.parse_args(args)
 
-    return dl(args.id, args.filename)
+    try:
+        return dl(args.id, args.filename)
+    except KeyboardInterrupt as e:
+        shutil.rmtree(TMPDIR)
 
 if __name__ == "__main__":
     import sys

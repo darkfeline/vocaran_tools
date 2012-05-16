@@ -182,11 +182,11 @@ vocaran_tools.py
 
 This is currently just a wrapper script for the above modules.  Calling::
 
-    vocaran_tools.py -d foo bar
+    vocaran_tools.py dl foo bar
 
 is identical to:::
 
     dl.py foo bar
 
-and '-c' to parse.py, '-m' to move_songs.py.  Eventually, all of these scripts
-will be moved to vocaran_tools.py.
+and 'parse' to parse.py, 'move' to move_songs.py.  Eventually, all of these
+scripts will be moved to vocaran_tools.py.

@@ -6,29 +6,26 @@ CLI script
 
 """
 
-ACTIONS=(('-d', '--download', 'download songs'),
-         ('-c', '--convert', 'convert song list ranks'),
-         ('-m', '--move', 'move songs')
-        )
-
 if __name__ == "__main__":
 
     import argparse
+    import sys
 
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('action', action='store', choices=('dl',
+        'parse', 'move'))
     parser.add_argument('args', nargs='*')
-    group = parser.add_mutually_exclusive_group(required=True)
-    for a, b, c in ACTIONS:
-        group.add_argument(a, b, dest='action', action='store_const', const=a, 
-                help=c)
     args = parser.parse_args()
 
-    if args.action == '-d':
+    if args.action == 'dl':
         import dl
+        sys.argv[0] = 'dl.py'
         dl.main(*args.args)
-    elif args.action == '-c':
+    elif args.action == 'parse':
         import parse
+        sys.argv[0] = 'parse.py'
         parse.main(*args.args)
-    elif args.action == '-m':
+    elif args.action == 'move':
         import move_songs
+        sys.argv[0] = 'move_songs.py'
         move_songs.main(*args.args)
