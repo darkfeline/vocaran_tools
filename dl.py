@@ -18,8 +18,8 @@ def dl(file, id, title='', artist='', album='', comment='', apic='def'):
     arbitrary number of string depending on the song, thus: '1', '2', '3'  It's
     probably better to either stick with 'def' or 'none'.
 
-    Replaced entirely by dl2(), as that function is superior to this one in
-    almost every single way.  This function will be kept for reference.
+    Replaced entirely by dl_nicomimi(), as that function is superior to this
+    one in almost every single way.  This function will be kept for reference.
 
     All dl functions should take the same arguments as this one and should have
     the same return state, i.e. new file downloaded and tagged and everything
@@ -42,8 +42,9 @@ def dl(file, id, title='', artist='', album='', comment='', apic='def'):
         f.write(data)
     conn.close()
 
-def dl2(file, id, title='', artist='', album='', comment='', apic='def'):
-    """Request an MP3 download from nicomimi.net, then tags file using stagger.
+def dl_nicomimi(file, id, title='', artist='', album='', comment='',
+        apic='def'):
+    """Request an MP3 download from nicomimi.net, then tag using stagger.
 
     file should probably match title and end in '.mp3' as the right extension.
     apic can be 'none' (no albumart), 'def' (default art), and an arbitrary
@@ -203,7 +204,7 @@ def dlmain(filename, *args):
         args.append(False)
     print('Downloading...')
     try:
-        dlloop(dl2, fields, filename, *args)
+        dlloop(dl_nicomimi, fields, filename, *args)
     except QuitException as e:
         raise e
     print('Done.')
