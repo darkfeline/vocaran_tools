@@ -13,6 +13,7 @@ import shutil
 import time
 
 from selenium import webdriver
+from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import NoSuchElementException
 
 TMPDIR = "tmp"
@@ -65,9 +66,12 @@ def dl(id, name):
     fp.set_preference("browser.download.manager.showAlertOnComplete", False)
 
     driver = webdriver.Firefox(firefox_profile=fp)
-    driver.implicitly_wait(30)
+    wait = WebDriverWait(driver, 10)
     base_url = "http://nicosound.anyap.info/sound/{}"
     driver.get(base_url.format(id))
+    wait.until(lambda driver:
+            driver.find_element_by_id(
+                'ctl00_ContentPlaceHolder1_SoundInfo1_btnExtract2'))
 
     try:
         x = driver.find_element_by_id(
