@@ -233,11 +233,6 @@ def dlmain(filename, dlf, *args):
             x[4] = x[0]
         if x[5] == '':
             x[5] = 'smile'
-    args = []
-    if '-f' in optlist:
-        args.append(True)
-    else:
-        args.append(False)
     print('Downloading...')
     try:
         dlloop(dlf, fields, filename, *args)
