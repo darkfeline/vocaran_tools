@@ -10,13 +10,13 @@ import hashlib
 import stagger
 from stagger.id3 import *
 
-def dl(file, id, title='', artist='', album='', comment='', apic='def'):
+import selenium_dl
+
+def dl(file, id, title='', artist='', album='', comment='', apic='none'):
     """Request a custom MP3 from nicomimi.net
 
     file should probably match the title and end in '.mp3' as the right
-    extension.  apic can be 'none' (no albumart), 'def' (default art), and an
-    arbitrary number of string depending on the song, thus: '1', '2', '3'  It's
-    probably better to either stick with 'def' or 'none'.
+    extension.  See getpic() and tag() for information about apic.
 
     Replaced entirely by dl_nicomimi(), as that function is superior to this
     one in almost every single way.  This function will be kept for reference.
@@ -43,13 +43,11 @@ def dl(file, id, title='', artist='', album='', comment='', apic='def'):
     conn.close()
 
 def dl_nicomimi(file, id, title='', artist='', album='', comment='',
-        apic='def'):
+        apic='none'):
     """Request an MP3 download from nicomimi.net, then tag using stagger.
 
-    file should probably match title and end in '.mp3' as the right extension.
-    apic can be 'none' (no albumart), 'def' (default art), and an arbitrary
-    number of string depending on the song, thus: '1', '2', '3'  It's probably
-    better to either stick with 'def' or 'none'.
+    file should probably match the title and end in '.mp3' as the right
+    extension.  See getpic() and tag() for information about apic.
 
     """
     cj = http.cookiejar.CookieJar()
@@ -64,68 +62,93 @@ def dl_nicomimi(file, id, title='', artist='', album='', comment='',
     conn.close()
     tag(file, id, title, artist, album, comment, apic)
 
-# TODO doesn't work yet 
-def dl3(file, id, title='', artist='', album='', comment='', apic='def'):
-    """dl from nicosound, tagged with tag() (stagger)"""
-    cj = http.cookiejar.CookieJar()
-    opener = urllib.request.build_opener(
-        urllib.request.HTTPCookieProcessor(cj))
-    conn = opener.open("http://nicosound.anyap.info/sound/{}".format(id))
-    html = conn.read()
-    conn.close()
-    params = urllib.parse.urlencode({'__EVENTTARGET' : eventtarget,
-                                     '__EVENTARGUMENT' : eventargument,
-                                     '__VIEWSTATE' : viewstate,
-                                     '__EVENTVALIDATION' : eventvalidation
-                                    })
-    params = params.encode('utf-8')
+def dl_nicosound(file, id, title='', artist='', album='', comment='',
+        apic='none'):
+    """Download MP3 from nicosound using selenium, then tag using stagger.
 
-    conn = opener.open("http://nicosound.anyap.info/sound/{}".format(id),
-                       params)
-    data = conn.read()
-    with open(file, 'wb') as f:
-        f.write(data)
-    conn.close()
+    file should probably match the title and end in '.mp3' as the right
+    extension.  See getpic() and tag() for information about apic.
+
+    """
+    selenium_dl.dl(id, file)
     tag(file, id, title, artist, album, comment, apic)
 
-def tag(file, id, title='', artist='', album='', comment='', apic='def'):
+def tag(file, id, title='', artist='', album='', comment='', apic='none'):
     """Tag the MP3 file using stagger.  
     
     comment is tagged as COMM, as opposed to USLT that nicomimi.net custom uses
     for comments/lyrics.  
     
-    apic can be 'none' (no albumart), 'def' (default art), and an arbitrary
-    number of string depending on the song, thus: '1', '2', '3'  It's probably
-    better to either stick with 'def' or 'none'.
+    file should probably match the title and end in '.mp3' as the right
+    extension.  See getpic for information about apic.  Additionally, if apic
+    is 'none', no picture is tagged.
     
     """
-    # get pic
-    getpic(file + '.jpg', id, apic)
     t = stagger.default_tag()
     t._filename = file
     t[TIT2] = title
     t[TPE1] = artist
     t[TALB] = album
     t[USLT] = USLT(text=comment)
-    t[APIC] = APIC(file + '.jpg')
+    if apic != 'none':
+        getpic(file + '.jpg', id, apic)
+        t[APIC] = APIC(file + '.jpg')
+        os.remove(file + '.jpg')
     t.write()
-    # remove pic
-    os.remove(file + '.jpg')
 
-def getpic(file, id, apic='def'):
-    """Get albumart from nicomimi.net servers and saves to file"""
-    param = ''
-    try:
-        if int(apic) > 0:
-            param = '?aw=' + int(apic)
-    except ValueError:
-        pass
-    conn = urllib.request.urlopen(
-        'http://www.nicomimi.net/thumbnail/{}{}'.format(id, param))
-    data = conn.read()
+def getpic(file, id, apic):
+    """Get albumart and save to file
+
+    apic can be the following:
+
+        The following use nicomimi.net servers.
+
+        'def' default art
+        '1', '2', ... arbitrary albumart for song (there may either be none or
+            more than 5, depending on song)
+
+        The following uses smilevideo.jp servers.
+
+        'smile' default icon
+
+    Returns 0 if everything went okay, and 1 if something went wrong.
+
+    """
+    if apic == 'none':
+        return 0
+    elif apic == 'def' or is_int(apic):
+        if is_int(apic):
+            id = id + '?aw=' + int(apic)
+        conn = urllib.request.urlopen(
+                'http://www.nicomimi.net/thumbnail/{}'.format(id))
+        data = conn.read()
+        conn.close()
+    elif apic == 'smile':
+        conn = urllib.request.urlopen(
+                'http://tn-skr4.smilevideo.jp/smile?i={}'.format(id[2:]))
+        data = conn.read()
+        conn.close()
+    else:
+        return 1
     with open(file, 'wb') as f:
         f.write(data)
-    conn.close()
+    return 0
+
+
+def is_int(string):
+    """Return True if string is string of int and False otherwise.
+
+    >>>is_int('one')
+    False
+    >>>is_int('15')
+    True
+
+    """
+    try:
+        int(string)
+        return True
+    except ValueError:
+        return False
 
 def get_vocaloidism(outfile, number):
     """Download ranking page source from Vocaloidism.
@@ -204,7 +227,7 @@ def dlmain(filename, *args):
         args.append(False)
     print('Downloading...')
     try:
-        dlloop(dl_nicomimi, fields, filename, *args)
+        dlloop(dl_nicosound, fields, filename, *args)
     except QuitException as e:
         raise e
     print('Done.')
