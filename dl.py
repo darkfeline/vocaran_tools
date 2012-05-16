@@ -11,11 +11,10 @@ import urllib.request
 import urllib.error
 import http.cookiejar
 import hashlib
+import subprocess
 
 import stagger
 from stagger.id3 import *
-
-import selenium_dl
 
 def dl(file, id, title='', artist='', album='', comment='', apic='none'):
     """Request a custom MP3 from nicomimi.net
@@ -75,7 +74,9 @@ def dl_nicosound(file, id, title='', artist='', album='', comment='',
     extension.  See getpic() and tag() for information about apic.
 
     """
-    selenium_dl.dl(id, file)
+    dir = os.path.dirname(__file__)
+    selenium_path = os.path.join(dir, 'selenium_dl.py')
+    subprocess.call([selenium_path, id, file])
     tag(file, id, title, artist, album, comment, apic)
 
 def tag(file, id, title='', artist='', album='', comment='', apic='none'):
