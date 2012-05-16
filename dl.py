@@ -263,10 +263,13 @@ def dlloop(dlf, fields, filename, force=False):
     re_error = re.compile(r'[Errno 110]')
     sessionfile= '.' + filename + '.dl.py.dat'
     # load session
-    print('Loading last session...')
-    j = load_session(sessionfile, filename)
-    if j < 0:
-        print("Data file checksum differs from file; ignoring session")
+    if os.path.isfile(sessionfile):
+        print('Loading last session...')
+        j = load_session(sessionfile, filename)
+        if j < 0:
+            print("Data file checksum differs from file; ignoring session")
+            j = 0
+    else:
         j = 0
     fields = fields[j:]
     # loop over each dl
