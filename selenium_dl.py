@@ -53,7 +53,8 @@ def dl(id, name):
     
     Returns 0 if all went well, 1 otherwise."""
 
-    os.mkdir(TMPDIR)
+    if not os.path.isdir(TMPDIR):
+        os.mkdir(TMPDIR)
 
     fp = webdriver.FirefoxProfile()
     fp.set_preference("browser.download.folderList", 2)
