@@ -122,7 +122,10 @@ def main(*args):
     parser.add_argument('filename')
     args = parser.parse_args(args)
 
-    return dl(args.id, args.filename)
+    try:
+        return dl(args.id, args.filename)
+    except KeyboardInterrupt as e:
+        shutil.rmtree(TMPDIR)
 
 if __name__ == "__main__":
     import sys
