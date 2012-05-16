@@ -77,7 +77,7 @@ def dl_nicosound(file, id, title='', artist='', album='', comment='',
     dir = os.path.dirname(__file__)
     selenium_path = os.path.join(dir, 'selenium_dl.py')
     return_code = subprocess.call([selenium_path, id, file])
-    if return_code != 1:
+    if return_code != 0:
         raise FileNotAvailableException()
     tag(file, id, title, artist, album, comment, apic)
 
