@@ -84,6 +84,7 @@ def dl(id, name):
                 "ctl00_ContentPlaceHolder1_SoundInfo1_btnExtract2")
         x.click()
     except NoSuchElementException:
+        driver.quit()
         shutil.rmtree(TMPDIR)
         return 1
 
