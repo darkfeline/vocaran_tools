@@ -13,6 +13,7 @@ import shutil
 import time
 
 from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException
 
 TMPDIR = "tmp"
 
@@ -48,7 +49,9 @@ def is_part(name):
 
 def dl(id, name):
 
-    """Download the MP3 and save with song"""
+    """Download the MP3 and save with song
+    
+    Returns 0 if all went well, 1 otherwise."""
 
     os.mkdir(TMPDIR)
 
@@ -75,12 +78,16 @@ def dl(id, name):
             "ctl00_Header1_VideoConvertingBox1_btnConvertMp3")
     x.click()
 
-    x = driver.find_element_by_id(
-            "ctl00_ContentPlaceHolder1_SoundInfo1_btnExtract2")
-    x.click()
+    try:
+        x = driver.find_element_by_id(
+                "ctl00_ContentPlaceHolder1_SoundInfo1_btnExtract2")
+        x.click()
+    except NoSuchElementException:
+        os.rmdir(TMPDIR)
+        return 1
 
     while 1:
-        time.sleep(3)
+        time.sleep(2)
         song = filter(is_part, os.listdir(TMPDIR))
         if len(song) == 0:
             break
@@ -92,12 +99,11 @@ def dl(id, name):
         raise Exception('Something is wrong.  ' + str(len(song)) + ' files in '
                 + TMPDIR)
     song = song[0]
-
     name = name
-
     shutil.move(os.path.join(TMPDIR, song), name)
 
     os.rmdir(TMPDIR)
+    return 0
 
 def main(*args):
 

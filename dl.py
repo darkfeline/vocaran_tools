@@ -76,7 +76,9 @@ def dl_nicosound(file, id, title='', artist='', album='', comment='',
     """
     dir = os.path.dirname(__file__)
     selenium_path = os.path.join(dir, 'selenium_dl.py')
-    subprocess.call([selenium_path, id, file])
+    return_code = subprocess.call([selenium_path, id, file])
+    if return_code != 1:
+        raise FileNotAvailableException()
     tag(file, id, title, artist, album, comment, apic)
 
 def tag(file, id, title='', artist='', album='', comment='', apic='none'):
@@ -290,6 +292,9 @@ def dlloop(dlf, fields, filename, force=False):
                         save_session(sessionfile, filename, i + j)
                         print('URLError: exiting...')
                         raise QuitException()
+            except FileNotAvailableException:
+                print('File not available; skipping...')
+                break
             else:
                 break
         print("Finished {} ({}/{})".format(
@@ -299,6 +304,9 @@ def dlloop(dlf, fields, filename, force=False):
 
 
 class QuitException(Exception):
+    pass
+
+class FileNotAvailableException(Exception):
     pass
 
 
