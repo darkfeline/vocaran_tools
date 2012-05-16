@@ -208,7 +208,9 @@ def dlmain(filename, *args):
     filename is name of song list file.
     args is passed directly to dlloop().
 
-    dlmain() sets comment field to id if it's blank.
+    dlmain() also handles some personal defaults.  In particular:
+    Comment fields are set to id if blank.
+    apic are set to 'smile' if blank.
 
     """
 
@@ -216,10 +218,12 @@ def dlmain(filename, *args):
 
     print('Parsing file...')
     fields = parse.parse_list(filename)
-    # set comment field to id if it's blank
+    # personal defaults here
     for x in fields:
+        if x[4] == '':
+            x[4] = x[0]
         if x[5] == '':
-            x[5] = x[0]
+            x[5] = 'smile'
     args = []
     if '-f' in optlist:
         args.append(True)
