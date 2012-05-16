@@ -124,11 +124,11 @@ def main(*args):
 
     parser = argparse.ArgumentParser(description='parse.py')
     parser.add_argument('source')
-    parser.add_argument('list_file')
+    parser.add_argument('rank_list_file')
     parser.add_argument('out_file')
     args = parser.parse_args(args)
 
-    parse_main(args.source, args.list_file, args.out_file)
+    parse_main(args.source, args.rank_list_file, args.out_file)
 
 def parse_main(source, list_file, out_file):
 
