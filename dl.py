@@ -189,23 +189,27 @@ def save_session(sessionfile, filename, i):
 def main(*args):
 
     import argparse
+    import sys
 
     parser = argparse.ArgumentParser(description='dl.py')
     parser.add_argument('-f', dest='force', action='store_true', default=False)
+    parser.add_argument('-m', '--method', dest='method', action='store',
+            choices=('dl_nicomimi', 'dl_nicosound'), default='dl_nicosound')
     parser.add_argument('file')
     args = parse.parse_args(args)
 
     try:
-        dlmain(args.file, args.force)
+        this = sys.modules[__name__]
+        dlmain(args.file, this.__dict__[args.method], args.force)
     except QuitException:
-        import sys
         sys.exit()
 
-def dlmain(filename, *args):
+def dlmain(filename, dlf, *args):
 
     """Parse song list file and pass on to dlloop
 
     filename is name of song list file.
+    dlf is dl function to use.
     args is passed directly to dlloop().
 
     dlmain() also handles some personal defaults.  In particular:
@@ -231,7 +235,7 @@ def dlmain(filename, *args):
         args.append(False)
     print('Downloading...')
     try:
-        dlloop(dl_nicosound, fields, filename, *args)
+        dlloop(dlf, fields, filename, *args)
     except QuitException as e:
         raise e
     print('Done.')
