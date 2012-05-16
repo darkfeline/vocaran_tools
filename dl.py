@@ -177,21 +177,24 @@ def load_session(sessionfile, filename):
     If the md5sum doesn't match, return -1.
     
     """
-    j = -1
-    if os.path.isfile(sessionfile):
-        with open(sessionfile) as f:
-            with open(filename) as g:
-                if (hashlib.sha256(g.read().encode('UTF-8')).hexdigest() ==
-                  f.readline().rstrip()):
-                    j = int(f.readline())
-    return j
+    with open(sessionfile) as f:
+        hash = f.readline().rstrip()
+        i = int(f.readline().rstrip())
+    with open(filename) as g:
+        if (hashlib.sha256(
+            ''.join(g.readlines()[:i+1]).rstrip().encode('UTF-8')
+            ).hexdigest() == hash):
+            return i
+    return -1
 
 def save_session(sessionfile, filename, i):
-    """Save index to sessionfile with md5sum of song list file."""
+    """Save index to sessionfile with md5sum of song list file up to index."""
     with open(sessionfile, 'w') as f:
         with open(filename) as g:
             f.write(hashlib.sha256(
-                g.read().encode('UTF-8')).hexdigest() + "\n")
+                ''.join(g.readlines()[:i+1]).rstrip().encode('UTF-8')
+                ).hexdigest())
+            f.write('\n')
             f.write(str(i))
 
 def main(*args):
