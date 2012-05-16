@@ -201,7 +201,7 @@ def main(*args):
     parser.add_argument('-m', '--method', dest='method', action='store',
             choices=('dl_nicomimi', 'dl_nicosound'), default='dl_nicosound')
     parser.add_argument('file')
-    args = parse.parse_args(args)
+    args = parser.parse_args(args)
 
     try:
         this = sys.modules[__name__]
