@@ -84,7 +84,7 @@ def dl(id, name):
                 "ctl00_ContentPlaceHolder1_SoundInfo1_btnExtract2")
         x.click()
     except NoSuchElementException:
-        os.rmdir(TMPDIR)
+        shutil.rmtree(TMPDIR)
         return 1
 
     while 1:
@@ -103,7 +103,7 @@ def dl(id, name):
     name = name
     shutil.move(os.path.join(TMPDIR, song), name)
 
-    os.rmdir(TMPDIR)
+    shutil.rmtree(TMPDIR)
     return 0
 
 def main(*args):
