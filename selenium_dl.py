@@ -66,18 +66,8 @@ def dl(id, name):
 
     driver = webdriver.Firefox(firefox_profile=fp)
     driver.implicitly_wait(30)
-    base_url = "http://nicosound.anyap.info/"
-    driver.get(base_url)
-
-    x = driver.find_element_by_id("ctl00_Header1_VideoConvertingBox1_txtUrl")
-    x.clear()
-
-    x = driver.find_element_by_id("ctl00_Header1_VideoConvertingBox1_txtUrl")
-    x.send_keys(id)
-
-    x = driver.find_element_by_id(
-            "ctl00_Header1_VideoConvertingBox1_btnConvertMp3")
-    x.click()
+    base_url = "http://nicosound.anyap.info/sound/{}"
+    driver.get(base_url.format(id))
 
     try:
         x = driver.find_element_by_id(
