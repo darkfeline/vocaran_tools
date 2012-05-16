@@ -93,11 +93,23 @@ def dl(id, name):
                 + TMPDIR)
     song = song[0]
 
-    name = name + ".mp3"
+    name = name
 
     shutil.move(os.path.join(TMPDIR, song), name)
 
     os.rmdir(TMPDIR)
 
+def main(*args):
+
+    import argparse
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('id')
+    parser.add_argument('filename')
+    args = parser.parse_args(args)
+
+    dl(args.id, args.filename)
+
 if __name__ == "__main__":
-    dl("sm13926857", "orange")
+    import sys
+    main(*sys.argv[1:])

@@ -15,7 +15,7 @@ if __name__ == "__main__":
 
     import argparse
 
-    parser = argparse.ArgumentParser(description='vocaran_tools utility.')
+    parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('args', nargs='*')
     group = parser.add_mutually_exclusive_group(required=True)
     for a, b, c in ACTIONS:

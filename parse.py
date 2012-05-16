@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
 
+"""
+parse.py
+
+"""
+
 import re
 
 SEP = "::"
@@ -122,7 +127,7 @@ def main(*args):
 
     import argparse
 
-    parser = argparse.ArgumentParser(description='parse.py')
+    parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('source')
     parser.add_argument('rank_list_file')
     parser.add_argument('out_file')

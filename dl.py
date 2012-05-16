@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
 
+"""
+dl.py
+
+"""
+
 import os
 import urllib.parse
 import urllib.request
@@ -191,7 +196,7 @@ def main(*args):
     import argparse
     import sys
 
-    parser = argparse.ArgumentParser(description='dl.py')
+    parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('-f', dest='force', action='store_true', default=False)
     parser.add_argument('-m', '--method', dest='method', action='store',
             choices=('dl_nicomimi', 'dl_nicosound'), default='dl_nicosound')

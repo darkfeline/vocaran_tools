@@ -62,6 +62,12 @@ for a in VOCALOIDS:
         PVOCALOIDS.append(re.compile(a))
 
 def main(*args):
+
+    import argparse
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    args = parser.parse_args(args)
+
     move_main()
 
 def move_main():
