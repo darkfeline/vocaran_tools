@@ -29,4 +29,4 @@ elif args.action == '-c':
     parse.main(*args.args)
 elif args.action == '-m':
     import move_songs
-    move_songs.main()
+    move_songs.main(*args.args)
