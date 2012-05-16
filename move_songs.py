@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 
-# move_songs.py
-# 
-# moves vocaloid songs according to artist tag
+"""
+move_songs.py
+
+moves vocaloid songs according to artist tag
+
+"""
 
 
 import os
@@ -58,9 +61,18 @@ for a in VOCALOIDS:
     else:
         PVOCALOIDS.append(re.compile(a))
 
-def main():
-    """Finds all MP3s in current directory by extension and runs process() on
-each."""
+def main(*args):
+
+    import argparse
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    args = parser.parse_args(args)
+
+    move_main()
+
+def move_main():
+    """Find all MP3s in current directory by extension and run process() on
+    each one."""
     dir = os.listdir(os.getcwd())
     p = re.compile(r".*\.mp3$", re.I)
     dir = [f for f in dir if p.match(f)]
@@ -68,6 +80,9 @@ each."""
         process(f)
 
 def process(file):
+
+    """Move file interactively."""
+
     tag = stagger.read_tag(file)
     title = tag.title
     artist = tag.artist
@@ -114,7 +129,7 @@ def process(file):
     while True:
         if guess == None:
             print("Couldn't guess directory")
-            i = input("[s]/c/t? ").lower()
+            i = input("[S/c/t]? ").lower()
             if i == "":
                 print("Skipping")
                 break
@@ -122,7 +137,7 @@ def process(file):
             newp = os.path.join(ROOT, guess)
             print("From: " + oldp)
             print("To: " + newp)
-            i = input("[y]/n/c/t? ").lower()
+            i = input("[Y/n/c/t]? ").lower()
             if i in ("y", ""):
                 move(oldp, newp, file)
                 break
@@ -156,6 +171,7 @@ def process(file):
             guess = input(ROOT + "/")
 
 def move(oldp, newp, file):
+
     print()
     if os.path.isdir(os.path.join(newp, file)):
         print("{} is a directory; skipping".format(os.path.join(newp,
@@ -192,7 +208,7 @@ def move(oldp, newp, file):
         print(template.format(title=title, artist=artist, length=length,
                               mtime=mtime))
 
-        i = input("[y]/n? ").lower()
+        i = input("[Y/n]? ").lower()
         if i in ("y", "yes", ""):
             os.rename(oldp, os.path.join(newp, file))
             print("Overwritten")
@@ -206,4 +222,5 @@ def move(oldp, newp, file):
         return 0
 
 if __name__ == '__main__':
-    main()
+    import sys
+    main(*sys.argv[1:])

@@ -1,21 +1,20 @@
 #!/usr/bin/env python3
 
+"""
+parse.py
+
+"""
+
 import re
 
 SEP = "::"
 NNDID = '[sn][mo][0-9]+'
 
-def srcparse(source):
-    """Returns a dict with song rank keys mapped to corresponding NND IDs using
-    the html source from Vocaloidism.
-        
-    The source should be the path to a file containing the html source of the
-    ranking section on the relevant Vocaloidism page.  srcparse scanes the
-    source and returns a dict where the key is a string which contains the rank
-    number of a song, with or without an 'h' prepended (the 'h' is present for
-    songs in the history section), 'pkp' or 'ed'.  The items each key refers to
-    is a string containing the NND ID (e.g. sm123456789 or nm123456789) of that
-    song.
+def parse_vocaloidism(source):
+    """Return a song rank dict parsed from Vocaloidism ranking page.
+    
+    source should be the path to a file containing the html source of the
+    relevant Vocaloidism weekly ranking page.
 
     """
     wvr = re.compile(r'<strong>.*?([0-9]+).*?www\.nicovideo\.jp/watch/' +
@@ -25,18 +24,18 @@ def srcparse(source):
                         '({})'.format(NNDID), re.I)
     wvred = re.compile(r'ED Song.*?www\.nicovideo\.jp/watch/' +
                        '({})'.format(NNDID), re.I)
-    links = {}
+    song_ranks = {}
     switch = 0
     with open(source) as src:
         for line in src:
             # check for pickup song match
             if wvrpkp.search(line):
                 match = wvrpkp.search(line)
-                links['pkp'] = match.group(1)
+                song_ranks['pkp'] = match.group(1)
             # check for ed song match
             elif wvred.search(line):
                 match = wvred.search(line)
-                links['ed'] = match.group(1)
+                song_ranks['ed'] = match.group(1)
             # scan line for song
             elif wvr.search(line):
                 match = wvr.search(line)
@@ -48,45 +47,30 @@ def srcparse(source):
                     if a == "1":
                         switch = 2
                     a = 'h' + a
-                links[a] = match.group(2)
-            # check for history
+                song_ranks[a] = match.group(2)
+            # check for start of history section
             elif switch == 0:
-                # if the line is not a song, check to see if the history
-                # section is starting
                 match = wvrhis.search(line)
                 if match:
                     switch = 1
-    return links
+    return song_ranks
 
-def checklinks(links):
-    """Checks if the links returned from srcparse() is complete or not.
-    Returns a set of expected keys that are missing."""
-    given = set(links)
+def checklinks(song_ranks):
+    """Check the song rank dict for completeness.
+
+    Return a set of expected keys that are missing.  Expected keys are '1' to
+    '30', 'h1' to 'h5', 'pkp' and 'ed'.
+    
+    """
+    given = set(song_ranks)
     expected = set([str(i) for i in range(1,31)] + 
                    ['h{}'.format(i) for i in range(1,6)] + ['pkp', 'ed'])
     return expected - given
 
-def lsparse(lst, links):
-    """Returns a list with all args needed to dl custom mp3 from nicomimi.
-    
-    [
-        [id, song_name, artist, album, comment, albumart],
-        .
-        .
-        .
-    ]
+def convert_list(filename, song_ranks):
 
-    lst is the name of a file with the following syntax: 
-        Each line has 6 fields, separated with the globally defined string SEP.
-        The first field is either one of the keys in links generated from
-        srcparse (i.e. rank number, with or without an 'h' prepended, 'pkp' or
-        'ed') or a raw NND ID.  The rest of the fields are song name, artist,
-        album, comment, albumart.  e.g.
-        rank_no|id::song_name::artist::album::comment::albumart
+    """Convert the song list file with ranks into a song list."""
 
-    links is the return list from srcparse()
-
-    """
     # regex magic follows
     sepm = r'(?:{})'.format(SEP)
     tail = sepm.join(r'(.*?)' for x in range(5))
@@ -95,43 +79,28 @@ def lsparse(lst, links):
     s = re.compile(SEP)
 
     fields = []
-    with open(lst) as src:
+    with open(filename) as src:
         for line in src:
             c = s.findall(line)
             line = line.rstrip() + SEP * (5 - len(c))
             match = rank.search(line)
             if match:
-                id = links[match.group(1).lower()]
+                id = song_ranks[match.group(1).lower()]
             else:
                 match = idm.search(line)
                 if match:
                     id = match.group(1).lower()
             if not match:
                 raise Exception("Error when parsing {file}: {line}".format(
-                    file=lst, line=line))
+                    file=filename, line=line))
             fields.append([id, match.group(2), match.group(3), match.group(4),
-                           match.group(5), match.group(6)][:len(c) + 1])
+                           match.group(5), match.group(6)])
     return fields
 
-def parse(lst):
-    """Returns a list with all args needed to dl custom mp3 from nicomimi.
-    
-    [
-        [id, song_name, artist, album, comment, albumart],
-        .
-        .
-        .
-    ]
+def parse_list(filename):
 
-    lst is the name of a file with the following syntax: 
-        Each line has 6 fields, separated with the globally defined string SEP.
-        The first field is either one of the keys in links generated from
-        srcparse (i.e. rank number, with or without an 'h' prepended or 'ed')
-        or a raw NND ID.  The rest of the fields are song name, artist, album,
-        comment, albumart.  e.g.
-        id::song_name::artist::album::comment::albumart
+    """Parse a song list file and return a song list."""
 
-    """
     # regex magic follows
     sep = r'(?:{})'.format(SEP)
     idp = re.compile(sep.join([r'^(?P<id>{})'.format(NNDID), r'(?P<title>.*?)',
@@ -141,40 +110,54 @@ def parse(lst):
     s = re.compile(SEP)
 
     fields = []
-    with open(lst) as src:
+    with open(filename) as src:
         for line in src:
-            c = s.findall(line) # number of SEPs in line
+            # pad out SEPs
+            c = s.findall(line)
             line = line.rstrip() + SEP * (5 - len(c))
 
             match = idp.search(line)
             if match:
                 g = match.group
                 fields.append([g('id'), g('title'), g('artist'), g('album'),
-                               g('comment'), g('albumart')][:len(c) + 1])
+                               g('comment'), g('albumart')])
     return fields
 
-def main(number, lst, out):
+def main(*args):
+
+    import argparse
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('source')
+    parser.add_argument('rank_list_file')
+    parser.add_argument('out_file')
+    args = parser.parse_args(args)
+
+    parse_main(args.source, args.rank_list_file, args.out_file)
+
+def parse_main(source, list_file, out_file):
+
     import os
     import dl
 
-    if os.path.isfile(number):
-        print('{} is a file; using as src'.format(number))
-        src = number
+    if os.path.isfile(source):
+        print('{} is a file; using as src'.format(source))
+        src = source
     else:
-        print('Getting Vocaloid HTML for week {}...'.format(number))
-        number = int(number)
+        print('Getting Vocaloid HTML for week {}...'.format(source))
+        source = int(source)
         src = 'src.tmp'
-        dl.getsrc(src, number)
+        dl.get_vocaloidism(src, source)
     print('parsing src...')
-    ranks = srcparse(src)
+    ranks = parse_vocaloidism(src)
     print('checking parsed links...')
     if checklinks(ranks):
-        raise Exception('srcparse links is incomplete.  Check src and/or \
-                        srcparse', checklinks(ranks))
+        raise Exception('parse_vocaloidism links is incomplete.  Check src and/or \
+                        parse_vocaloidism', checklinks(ranks))
     print('parsing rank...')
-    fields = lsparse(lst, ranks)
-    print('appending to lst...')
-    with open(out, 'a') as f:
+    fields = convert_list(list_file, ranks)
+    print('appending to list_file...')
+    with open(out_file, 'a') as f:
         for item in fields:
             line = ""
             for x in item:
@@ -190,9 +173,4 @@ def main(number, lst, out):
 
 if __name__ == '__main__':
     import sys
-
-    number = sys.argv[1]
-    lst = sys.argv[2]
-    out = sys.argv[3]
-
-    main(number, lst, out)
+    main(*sys.argv[1:])
