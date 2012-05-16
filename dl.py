@@ -296,7 +296,7 @@ def dlloop(dlf, fields, filename, force=False):
                         print('URLError: exiting...')
                         raise QuitException()
             except FileNotAvailableException:
-                print('File not available; skipping...')
+                print('File not available; writing dummy file...')
                 break
             else:
                 break

@@ -85,6 +85,10 @@ def dl(id, name):
         x.click()
     except NoSuchElementException:
         driver.quit()
+        # write a dummy file
+        with open(name, 'w') as f:
+            f.write('dummy')
+            f.close()
         shutil.rmtree(TMPDIR)
         return 1
 
