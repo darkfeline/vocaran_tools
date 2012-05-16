@@ -92,6 +92,8 @@ def dl(id, name):
         shutil.rmtree(TMPDIR)
         return 1
 
+    driver.get('chrome://mozapps/content/downloads/downloads.xul')
+
     while 1:
         time.sleep(2)
         song = filter(is_part, os.listdir(TMPDIR))
