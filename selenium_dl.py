@@ -115,8 +115,9 @@ def main(*args):
     parser.add_argument('filename')
     args = parser.parse_args(args)
 
-    dl(args.id, args.filename)
+    return dl(args.id, args.filename)
 
 if __name__ == "__main__":
     import sys
-    main(*sys.argv[1:])
+    code = main(*sys.argv[1:])
+    sys.exit(code)
