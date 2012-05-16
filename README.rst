@@ -41,8 +41,8 @@ Song list files contain one song entry per line::
 
 Song list files with ranks also take ranks in song entries::
 
-    song_entry_with_ranks ::= NND_id_with_rank SEP song_name [ SEP artist [ SEP
-                              album [ SEP comment [ SEP albumart ] ] ] ]
+    song_entry_with_ranks ::= NND_id_with_rank SEP song_name [SEP artist [SEP
+                              album [SEP comment [SEP albumart]]]]
     NND_id_with_rank ::= NND_id | ['h'] ('0' .. '9')+ | 'pkp' | 'ed'
 
 - The ranks must correspond to a single weekly Vocaran's rankings.
