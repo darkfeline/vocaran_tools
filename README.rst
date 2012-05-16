@@ -5,6 +5,20 @@ vocaran_tools
 Dependencies
 ------------
 
+Both `Python`_ 3 and Python 2 are needed.  While vocaran_tools is primarily a
+Python 3 library, it relies on selenium for browser automation to download from
+nicosound.anyap.info, and selenium is currently Python 2 only.
+
+.. _Python: http://www.python.org/download/
+
+Speaking of which, `selenium`_ is required for Python 2.
+
+.. _selenium: http://pypi.python.org/pypi/selenium/
+
+`Firefox`_ should also be installed.
+
+.. _Firefox: https://www.mozilla.org/en-US/firefox/new/
+
 dl.py and move_songs.py depends on `stagger`_, a Python 3 package for
 ID3v1/ID3v2 tag manipulation.
 
@@ -84,8 +98,8 @@ functionality is now in parse.py.  Run dl.py from the command line::
 
     dl.py list
 
-list is a file containing the songs to download and relevant information, one
-per line in the following format::
+list is a song list file, containing the songs to download and relevant
+information, one per line in the following format::
 
     id::song_name::artist::album::comment::albumart
 
@@ -94,16 +108,11 @@ per line in the following format::
 - song_name (TIT2) will be used to tag the song; optional.
 - artist (TPE1) will be used to tag the song; optional.
 - album (TALB) will be used to tag the song; optional.
-- comment (COMM) will be used to tag the song; optional.  The tag
-  nicomimi uses for this is the ID3v2 lyrics tag USLT, NOT the ID3v2 comments
-  tag COMM.  However, now that dl.py uses altdl() instead of dl(), comments are
-  tagged to COMM.  Defaults to the NND id of the song.
-- albumart (APIC) will be used to choose the attached picture.
-  Valid values are 'none', 'def', '1', '2', et cetera.  While 'none' (no album
-  art) and 'def' (default album art) are guaranteed, any numbered art (1, 2,
-  3...) and how many numbered art are available are NOT guaranteed.  Although
-  now dl.py uses altdl() to download and tag MP3s, the script will still grab
-  pictures from the same location on nicomimi.net servers.  Defaults to 'def'.
+- comment (COMM) will be used to tag the song; optional.  Defaults to the NND
+  id of the song.
+- albumart (APIC) will be used to choose the attached picture.  Check the
+  docstrings for tag() and getpic() in dl.py for more information.  Defaults to
+  'smile'.
 
 - The default field separator is '::', as it is unlikely to appear in the title
   of a song.  This can be changed, for now, by editing parse.py (dl.py uses
@@ -122,7 +131,7 @@ You can also write custom dl functions if you should need to.  dl function
 names should start with dl, and take the same arguments as the base dl
 function::
 
-    def dl(file, id, title, artist, album='', comment='', apic='def'):
+    def dl(file, id, title, artist, album='', comment='', apic='none'):
 
 The function returns nothing, and has the end state of a file with the given
 name created in the current directory which is the MP3 of the corresponding
@@ -139,10 +148,11 @@ Run parse.py from the command line::
     
     parse.py number list out
 
-list is formatted similarly to the input to dl.py, but the id field can
-additionally be a rank number (1-150ish, depending on the week), history rank
-number (h1-h5), pick-up (pkp) or ED (ed).  parse.py appends the lines to out,
-translating rank numbers and such into NND ids.
+list is a song list file with ranks, formatted similarly to the input to dl.py,
+but the id field can additionally be a rank number (1-150ish, depending on the
+week), history rank number (h1-h5), pick-up (pkp) or ED (ed).  parse.py
+translates the rank numbers to NND ids and appends the translated lines to out,
+a growing song list file.
 
 number can either be the week number, or the name of a file containing the HTML
 source downloaded from the respective Vocaloidism page.
@@ -165,4 +175,18 @@ directory.
 Additionally, move_songs.py will check for corrupt downloads (when the song is
 less than a certain size), and prompt to skip.  These generally result from
 when the song is not available via the selected dl function, yielding an html
-erro page instead of a valid mp3 file.
+error page instead of a valid mp3 file.
+
+vocaran_tools.py
+````````````````
+
+This is currently just a wrapper script for the above modules.  Calling::
+
+    vocaran_tools.py -d foo bar
+
+is identical to:::
+
+    dl.py foo bar
+
+and '-c' to parse.py, '-m' to move_songs.py.  Eventually, all of these scripts
+will be moved to vocaran_tools.py.
