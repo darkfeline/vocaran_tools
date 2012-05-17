@@ -29,6 +29,12 @@ use your distro's package manager.
 
 .. _mp3info: http://www.ibiblio.org/mp3info/
 
+test.py, containing the test suite for vocaran_tools.py, requires `md5sum`_, a
+common utility.  On the off chance you don't have it, it's not necessary
+anyway, unless you want to run the tests yourself.
+
+.. _md5sum: https://en.wikipedia.org/wiki/Md5sum
+
 Specifications
 --------------
 

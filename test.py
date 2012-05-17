@@ -5,30 +5,35 @@ import os
 import os.path
 import shutil
 import filecmp
+import subprocess
 
 import parse
+import dl
 
 TESTDIR = 'test'
 TMPDIR = 'tmp'
 
-class TestParse(unittest.TestCase):
+class TestFiles(unittest.TestCase):
 
     def setUp(self):
         shutil.copytree(TESTDIR, TMPDIR)
-        self.files = {}
-        for f in os.listdir(TMPDIR):
-            self.files[f] = os.path.join(TMPDIR, f)
+        os.chdir(TMPDIR)
 
     def test_convert_w_src(self):
-        parse.main(self.files['src239'], self.files['rank239'],
-                self.files['list'])
-        self.assertTrue(filecmp.cmp(self.files['list'], self.files['list2']))
+        parse.main('src239', 'rank239', 'list')
+        self.assertTrue(filecmp.cmp('list', 'list2'))
 
     def test_convert_wo_src(self):
-        parse.main('239', self.files['rank239'], self.files['list'])
-        self.assertTrue(filecmp.cmp(self.files['list'], self.files['list2']))
+        parse.main('239', 'rank239', 'list')
+        self.assertTrue(filecmp.cmp('list', 'list2'))
+
+    def test_dl_nicosound(self):
+        dl.main('-m', 'dl_nicosound', 'list3')
+        x = subprocess.call(('md5sum', '-c', 'hash'))
+        self.assertTrue(x == 0)
 
     def tearDown(self):
+        os.chdir('..')
         shutil.rmtree(TMPDIR)
 
 if __name__ == "__main__":
