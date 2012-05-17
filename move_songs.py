@@ -190,10 +190,10 @@ def move(oldp, newp, file):
         length = length.lstrip('0:')
         mtime = time.strftime("%a, %d %b %Y %H:%M:%S +0000",
                   time.gmtime(os.path.getmtime(os.path.join(newp, file))))
-        template = "Old:\nTitle:{title}\nArtist:{artist}\nLength:{length}\
+        template = "Title:{title}\nArtist:{artist}\nLength:{length}\
                 \nmtime:{mtime}"
-        print(template.format(title=title, artist=artist, length=length,
-                              mtime=mtime))
+        print("Old:\n" + template.format(title=title, artist=artist,
+            length=length, mtime=mtime))
 
         tag = stagger.read_tag(oldp)
         title = tag.title
@@ -205,8 +205,8 @@ def move(oldp, newp, file):
         length = length.lstrip('0:')
         mtime = time.strftime("%a, %d %b %Y %H:%M:%S +0000",
                   time.gmtime(os.path.getmtime(oldp)))
-        print(template.format(title=title, artist=artist, length=length,
-                              mtime=mtime))
+        print("New:\n" + template.format(title=title, artist=artist,
+            length=length, mtime=mtime))
 
         i = input("[Y/n]? ").lower()
         if i in ("y", "yes", ""):
