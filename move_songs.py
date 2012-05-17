@@ -208,8 +208,8 @@ def move(oldp, newp, file):
         print("New:\n" + template.format(title=title, artist=artist,
             length=length, mtime=mtime))
 
-        i = input("[Y/n]? ").lower()
-        if i in ("y", "yes", ""):
+        i = input("[y/N]? ").lower()
+        if i in ("y", "yes"):
             os.rename(oldp, os.path.join(newp, file))
             print("Overwritten")
             return 0
