@@ -83,14 +83,6 @@ def process(file):
 
     """Move file interactively."""
 
-    tag = stagger.read_tag(file)
-    title = tag.title
-    artist = tag.artist
-    print("-" * 60)
-    print("File: " + file)
-    print("Title: " + title)
-    print("Artist: " + artist)
-
     # check file size for zero length files
     if os.path.getsize(file) < 500:
         print('File size is ' + str(os.path.getsize(file)) + 
@@ -101,6 +93,14 @@ def process(file):
             return
         else:
             print('Continuing ({} may be corrupt)'.format(file))
+
+    tag = stagger.read_tag(file)
+    title = tag.title
+    artist = tag.artist
+    print("-" * 60)
+    print("File: " + file)
+    print("Title: " + title)
+    print("Artist: " + artist)
 
     # guess file (in guess)
     imatch = []
