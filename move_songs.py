@@ -86,7 +86,7 @@ def process(file):
     # check file size for zero length files
     if os.path.getsize(file) < 500:
         print('File size is ' + str(os.path.getsize(file)) + 
-              ' bytes. Skip?  [y]/n ')
+              ' bytes. Skip?  [Y/n] ')
         i = input()
         if i.lower() in ['y', 'yes', '']:
             print('Skipping')
