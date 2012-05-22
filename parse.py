@@ -67,46 +67,31 @@ def checklinks(song_ranks):
                    ['h{}'.format(i) for i in range(1,6)] + ['pkp', 'ed'])
     return expected - given
 
-def convert_list(filename, song_ranks):
-
-    """Convert the song list file with ranks into a song list."""
-
-    # regex magic follows
-    sepm = r'(?:{})'.format(SEP)
-    tail = sepm.join(r'(.*?)' for x in range(5))
-    rank = re.compile(r'^(h?[0-9]+|ed|pkp)' + sepm + tail, re.I)
-    idm = re.compile(r'^({})'.format(NNDID) + sepm + tail, re.I)
-    s = re.compile(SEP)
-
-    fields = []
-    with open(filename) as src:
-        for line in src:
-            c = s.findall(line)
-            line = line.rstrip() + SEP * (5 - len(c))
-            match = rank.search(line)
-            if match:
-                id = song_ranks[match.group(1).lower()]
-            else:
-                match = idm.search(line)
-                if match:
-                    id = match.group(1).lower()
-            if not match:
-                raise Exception("Error when parsing {file}: {line}".format(
-                    file=filename, line=line))
-            fields.append([id, match.group(2), match.group(3), match.group(4),
-                           match.group(5), match.group(6)])
+def convert_list(fields, song_ranks):
+    """Convert the song list with ranks into a song list."""
+    rank = re.compile(r'h?[0-9]+|ed|pkp', re.I)
+    for entry in fields:
+        if rank.match(entry[0]):
+            entry[0] = song_ranks[entry[0].lower()]
     return fields
 
-def parse_list(filename):
+def read_list(filename, ranks=False):
 
-    """Parse a song list file and return a song list."""
+    """Parse a song list file and return a song list.
+    
+    If ranks is True, then read_list() will treat the file as a song list file
+    with ranks and return a song list with ranks.
+    
+    """
 
     # regex magic follows
     sep = r'(?:{})'.format(SEP)
-    idp = re.compile(sep.join([r'^(?P<id>{})'.format(NNDID), r'(?P<title>.*?)',
-                               r'(?P<artist>.*?)', r'(?P<album>.*?)',
-                               r'(?P<comment>.*?)', r'(?P<albumart>.*?)']),
-                     re.I) 
+    rank = ''
+    if ranks == True:
+        rank = r'|h?[0-9]+|ed|pkp'
+    idp = re.compile(sep.join([r'^(?P<id>{})'.format(NNDID + rank),
+        r'(?P<title>.*?)', r'(?P<artist>.*?)', r'(?P<album>.*?)',
+        r'(?P<comment>.*?)', r'(?P<albumart>.*?)']), re.I) 
     s = re.compile(SEP)
 
     fields = []
@@ -115,13 +100,27 @@ def parse_list(filename):
             # pad out SEPs
             c = s.findall(line)
             line = line.rstrip() + SEP * (5 - len(c))
-
             match = idp.search(line)
             if match:
                 g = match.group
                 fields.append([g('id'), g('title'), g('artist'), g('album'),
                                g('comment'), g('albumart')])
+            else:
+                raise Exception("Error when parsing {file}: {line}".format(
+                    file=filename, line=line))
     return fields
+
+def write_list(fields, filename):
+    """Writes a song list to a song list file."""
+    with open(filename, 'w') as f:
+        for item in fields:
+            line = ""
+            for x in item:
+                line += x
+                line += SEP
+            line = line[:len(line) - len(SEP)] # cut off final SEP
+            line += '\n'
+            f.write(line)
 
 def main(*args):
 
@@ -138,6 +137,7 @@ def main(*args):
 def parse_main(source, list_file, out_file):
 
     import os
+    import os.path
     import dl
 
     if os.path.isfile(source):
@@ -154,18 +154,20 @@ def parse_main(source, list_file, out_file):
     if checklinks(ranks):
         raise Exception('parse_vocaloidism links is incomplete.  Check src and/or \
                         parse_vocaloidism', checklinks(ranks))
+    if os.path.exists(out_file):
+        if os.path.isfile(out_file):
+            print('parsing original file...')
+            fields1 = read_list(out_file)
+        else:
+            raise Exception(out_file + ' is a directory.')
     print('parsing rank...')
-    fields = convert_list(list_file, ranks)
-    print('appending to list_file...')
-    with open(out_file, 'a') as f:
-        for item in fields:
-            line = ""
-            for x in item:
-                line += x
-                line += SEP
-            line = line[:len(line) - len(SEP)] # cut off final SEP
-            line += '\n'
-            f.write(line)
+    fields2 = read_list(list_file, ranks=True)
+    print('converting ranks...')
+    fields2 = convert_list(fields2, ranks)
+    print('combining lists...')
+    fields = fields1 + fields2
+    print('writing to list_file...')
+    write_list(fields, out_file)
     if os.path.isfile('src.tmp'):
         print('removing src.tmp...')
         os.remove('src.tmp')

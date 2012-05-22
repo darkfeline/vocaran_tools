@@ -232,7 +232,7 @@ def dlmain(filename, dlf, *args):
     import parse
 
     print('Parsing file...')
-    fields = parse.parse_list(filename)
+    fields = parse.read_list(filename)
     # personal defaults here
     for x in fields:
         if x[4] == '':
