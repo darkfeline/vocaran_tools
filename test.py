@@ -7,8 +7,8 @@ import shutil
 import filecmp
 import subprocess
 
-import parse
-import dl
+from vocaran_tools.scripts import parse
+from vocaran_tools.scripts import dl
 
 TESTDIR = 'test'
 TMPDIR = 'tmp'
