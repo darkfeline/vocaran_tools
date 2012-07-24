@@ -83,6 +83,17 @@ def process(file):
 
     """Move file interactively."""
 
+    # check file size for zero length files
+    if os.path.getsize(file) < 500:
+        print('File size is ' + str(os.path.getsize(file)) + 
+              ' bytes. Skip?  [Y/n] ')
+        i = input()
+        if i.lower() in ['y', 'yes', '']:
+            print('Skipping')
+            return
+        else:
+            print('Continuing ({} may be corrupt)'.format(file))
+
     tag = stagger.read_tag(file)
     title = tag.title
     artist = tag.artist
@@ -90,17 +101,6 @@ def process(file):
     print("File: " + file)
     print("Title: " + title)
     print("Artist: " + artist)
-
-    # check file size for zero length files
-    if os.path.getsize(file) < 500:
-        print('File size is ' + str(os.path.getsize(file)) + 
-              ' bytes. Skip?  [y]/n ')
-        i = input()
-        if i.lower() in ['y', 'yes', '']:
-            print('Skipping')
-            return
-        else:
-            print('Continuing ({} may be corrupt)'.format(file))
 
     # guess file (in guess)
     imatch = []
@@ -190,10 +190,10 @@ def move(oldp, newp, file):
         length = length.lstrip('0:')
         mtime = time.strftime("%a, %d %b %Y %H:%M:%S +0000",
                   time.gmtime(os.path.getmtime(os.path.join(newp, file))))
-        template = "Old:\nTitle:{title}\nArtist:{artist}\nLength:{length}\
+        template = "Title:{title}\nArtist:{artist}\nLength:{length}\
                 \nmtime:{mtime}"
-        print(template.format(title=title, artist=artist, length=length,
-                              mtime=mtime))
+        print("Old:\n" + template.format(title=title, artist=artist,
+            length=length, mtime=mtime))
 
         tag = stagger.read_tag(oldp)
         title = tag.title
@@ -205,11 +205,11 @@ def move(oldp, newp, file):
         length = length.lstrip('0:')
         mtime = time.strftime("%a, %d %b %Y %H:%M:%S +0000",
                   time.gmtime(os.path.getmtime(oldp)))
-        print(template.format(title=title, artist=artist, length=length,
-                              mtime=mtime))
+        print("New:\n" + template.format(title=title, artist=artist,
+            length=length, mtime=mtime))
 
-        i = input("[Y/n]? ").lower()
-        if i in ("y", "yes", ""):
+        i = input("[y/N]? ").lower()
+        if i in ("y", "yes"):
             os.rename(oldp, os.path.join(newp, file))
             print("Overwritten")
             return 0

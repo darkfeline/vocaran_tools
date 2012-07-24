@@ -13,7 +13,8 @@ import shutil
 import time
 
 from selenium import webdriver
-from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.common.exceptions import TimeoutException
 
 TMPDIR = "tmp"
 
@@ -65,15 +66,13 @@ def dl(id, name):
     fp.set_preference("browser.download.manager.showAlertOnComplete", False)
 
     driver = webdriver.Firefox(firefox_profile=fp)
-    driver.implicitly_wait(30)
+    wait = WebDriverWait(driver, 10)
     base_url = "http://nicosound.anyap.info/sound/{}"
     driver.get(base_url.format(id))
-
     try:
-        x = driver.find_element_by_id(
-                "ctl00_ContentPlaceHolder1_SoundInfo1_btnExtract2")
-        x.click()
-    except NoSuchElementException:
+        wait.until(lambda driver: driver.find_element_by_id(
+            'ctl00_ContentPlaceHolder1_SoundInfo1_btnExtract2'))
+    except TimeoutException:
         driver.quit()
         # write a dummy file
         with open(name, 'w') as f:
@@ -81,6 +80,10 @@ def dl(id, name):
             f.close()
         shutil.rmtree(TMPDIR)
         return 1
+
+    x = driver.find_element_by_id(
+            "ctl00_ContentPlaceHolder1_SoundInfo1_btnExtract2")
+    x.click()
 
     driver.get('chrome://mozapps/content/downloads/downloads.xul')
 
