@@ -2,6 +2,8 @@
 vocaran_tools
 =============
 
+Version 1.2.2
+
 Dependencies
 ------------
 
@@ -11,7 +13,7 @@ nicosound.anyap.info, and selenium is currently Python 2 only.
 
 .. _Python: http://www.python.org/download/
 
-Speaking of which, `selenium`_ is required for Python 2.
+Speaking of which, `selenium`_ for Python 2 is required.
 
 .. _selenium: http://pypi.python.org/pypi/selenium/
 
@@ -62,7 +64,7 @@ Song list files contain one song entry per line::
 Song list files with ranks also take ranks in song entries::
 
     song_entry_with_ranks ::= NND_id_with_rank SEP song_name [SEP artist [SEP
-                              album [SEP comment [SEP albumart]]]]
+                              album [SEP comment [SEP apic]]]]
     NND_id_with_rank ::= NND_id | ['h'] ('0' .. '9')+ | 'pkp' | 'ed'
 
 - The ranks must correspond to a single weekly Vocaran's rankings.
@@ -79,7 +81,7 @@ format::
     'h5':'nm123456789',
     'pkp':'sm1',
     'ed':'sm2',
-    '13',:sm3', ...
+    '13':'sm3', ...
     }
 
 Song lists are list representations of song list files.  They have the
@@ -94,6 +96,11 @@ following format::
 
 Modules
 -------
+
+Note: The following is out-of-date following package restructuring and
+development of a curses user interface.  The dl.py, parse.py, and move_songs.py
+scripts are now in vocaran_tools/scripts, while vocaran_tools.py will still
+work as per the following.
 
 dl.py
 `````
