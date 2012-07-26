@@ -70,7 +70,7 @@ def dlmain(filename, dlf, *args):
 
     """
 
-    from vocaran_tools import parse
+    from vocaran_tools.data import parse
 
     print('Parsing file...')
     fields = parse.read_list(filename)

@@ -5,7 +5,7 @@ parse.py
 
 """
 
-from vocaran_tools import parse
+from vocaran_tools.data import parse
 
 def main(*args):
 

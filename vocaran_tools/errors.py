@@ -5,3 +5,14 @@ class QuitException(Exception):
 
 class FileNotAvailableException(Exception):
     pass
+
+# DMExceptions
+
+class DMException(Exception):
+    pass
+
+class InitException(DMException):
+    pass
+
+class DataException(DMException):
+    pass
