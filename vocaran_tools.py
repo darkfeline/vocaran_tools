@@ -18,14 +18,14 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.action == 'dl':
-        import dl
+        from vocaran_tools.scripts import dl
         sys.argv[0] = 'dl.py'
         dl.main(*args.args)
     elif args.action == 'parse':
-        import parse
+        from vocaran_tools.scripts import parse
         sys.argv[0] = 'parse.py'
         parse.main(*args.args)
     elif args.action == 'move':
-        import move_songs
+        from vocaran_tools.scripts import move_songs
         sys.argv[0] = 'move_songs.py'
         move_songs.main(*args.args)
