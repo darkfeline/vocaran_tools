@@ -95,12 +95,13 @@ class RankedSongEntry(SongEntry):
 
     @id.setter
     def id(self, value):
-        if not self.__class__._rank.match(value):
-            raise TypeError('"value" must be a valid NNID string or rank.')
-        try:
-            super(RankedSongEntry, self.__class__).id.fset(self, value)
-        except TypeError:
-            raise TypeError('"value" must be a valid NNID string or rank.')
+        if self._rank.match(value):
+            super().values['id'] = value
+        else:
+            try:
+                super(RankedSongEntry, self.__class__).id.fset(self, value)
+            except TypeError:
+                raise TypeError('"value" must be a valid NNID string or rank.')
 
 
 class SongList:
