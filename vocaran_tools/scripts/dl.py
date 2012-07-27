@@ -117,13 +117,13 @@ def dlloop(dlf, slist, path, force=False):
             continue
         name = entry.name + '.mp3'
         name = re_illegal.sub('|', name)
-        print("Fetching {} ({}/{})".format(name, i, len(slist)))
+        print("Fetching {} ({}/{})".format(name, i + 1, len(slist)))
         while True:
             try:
                 dlf(name, *entry)
             except KeyboardInterrupt as e:
                 print('Writing current session...')
-                save_session(sessionfile, path, i)
+                save_session(sessionfile, path, i - 1)
                 raise ExitException(0)
             except urllib.error.URLError as e:
                 if re_error.search(str(e)):
@@ -131,7 +131,7 @@ def dlloop(dlf, slist, path, force=False):
                         print('URLError: retrying...')
                         continue
                     else:
-                        save_session(sessionfile, path, i)
+                        save_session(sessionfile, path, i - 1)
                         print('URLError: exiting...')
                         raise ExitException(1)
             except FileNotAvailableError:
@@ -139,7 +139,7 @@ def dlloop(dlf, slist, path, force=False):
                 break
             else:
                 break
-        print("Finished {} ({}/{})".format(name, i, len(slist)))
+        print("Finished {} ({}/{})".format(name, i + 1, len(slist)))
 
 if __name__ == "__main__":
     import sys
