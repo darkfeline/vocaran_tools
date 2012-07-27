@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 
-class QuitException(Exception):
-    pass
+class ExitException(Exception):
+    def __init__(self, code=0, *args):
+        self.code = code
+        super().__init__(*args)
 
 class FileNotAvailableException(Exception):
     pass

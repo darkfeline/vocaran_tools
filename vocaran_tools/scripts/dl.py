@@ -10,7 +10,7 @@ import urllib.parse
 import urllib.error
 import hashlib
 
-from vocaran_tools.errors import QuitException, FileNotAvailableException
+from vocaran_tools.errors import ExitException, FileNotAvailableException
 
 def load_session(sessionfile, filename):
     """Return the index from session file after checking md5sum.
@@ -53,7 +53,7 @@ def main(*args):
     try:
         from vocaran_tools import dl
         dlmain(args.file, dl.__dict__[args.method], args.force)
-    except QuitException:
+    except ExitException:
         sys.exit()
 
 def dlmain(filename, dlf, *args):
@@ -83,7 +83,7 @@ def dlmain(filename, dlf, *args):
     print('Downloading...')
     try:
         dlloop(dlf, fields, filename, *args)
-    except QuitException as e:
+    except ExitException as e:
         raise e
     print('Done.')
 
@@ -129,7 +129,7 @@ def dlloop(dlf, fields, filename, force=False):
                 if 'i' in locals():
                     print('Writing current session...')
                     save_session(sessionfile, filename, i + j)
-                raise QuitException()
+                raise ExitException()
             except urllib.error.URLError as e:
                 if re_error.search(str(e)):
                     if force:
@@ -138,7 +138,7 @@ def dlloop(dlf, fields, filename, force=False):
                     else:
                         save_session(sessionfile, filename, i + j)
                         print('URLError: exiting...')
-                        raise QuitException()
+                        raise ExitException()
             except FileNotAvailableException:
                 print('File not available; writing dummy file...')
                 break
