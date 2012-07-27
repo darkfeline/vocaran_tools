@@ -11,8 +11,9 @@ import urllib.error
 import hashlib
 
 from vocaran_tools.errors import ExitException, FileNotAvailableException
+from vocaran_tools.errors import DataException
 from vocaran_tools import dl
-from vocaran_tools.data import dm
+from vocaran_tools.data import dm, songlist
 
 def load_session(sessionfile, filename):
     """Return the index from session file after checking md5sum.
@@ -67,6 +68,8 @@ def dlmain(week, dlf, *args):
 
     print('Loading song list...')
     slist = dm.get_songlist(week)
+    if isinstance(slist, songlist.RankedSongList):
+        raise DataException('Translate first.')
     # personal defaults here
     for entry in slist:
         if entry.comment == '':
