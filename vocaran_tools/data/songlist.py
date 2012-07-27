@@ -106,7 +106,7 @@ class SongList:
     _special_str = '% {} \n'
     _special_re = re.compile(r'^% (\w+)')
 
-    def __init__(self, file, week='0'):
+    def __init__(self, file='', week='0'):
         self.week = week
         self.entries = []
         self.file = file
