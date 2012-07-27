@@ -166,6 +166,9 @@ class SongList:
     def __delitem__(self, key):
         del self.entries[key]
 
+    def __iter__(self):
+        return iter(self.entries)
+
 
 class RankedSongList(SongList):
 
