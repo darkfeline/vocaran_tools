@@ -31,3 +31,4 @@ if __name__ == "__main__":
         move_songs.main(*sys.argv[2:])
     else:
         print("{} is not valid.".format(sys.argv[1]))
+        print(__doc__)
