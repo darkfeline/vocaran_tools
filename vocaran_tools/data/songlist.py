@@ -32,7 +32,7 @@ class SongEntry:
         return x
 
     def __iter__(self):
-        return [getattr(self, x) for x in self._save]
+        return iter([getattr(self, x) for x in self._save])
 
     @property
     def id(self):
