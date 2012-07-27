@@ -6,7 +6,8 @@ add.py
 """
 
 from vocaran_tools.data import dm, parse
-from vocaran_tools.errors import StructureException, ExitException
+from vocaran_tools.errors import StructureException, FileFormatError
+from vocaran_tools.errors import ExitException
 
 def main(*args):
 
@@ -22,7 +23,7 @@ def main(*args):
 def add_main(week, file):
     try:
         slist = parse.read_list(file, ranks=True)
-    except StructureException as e:
+    except (StructureException, FileFormatError) as e:
         print(str(e))
         raise ExitException(1)
     slist.file = dm.get_songlist_path(week)
