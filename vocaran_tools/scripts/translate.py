@@ -11,7 +11,7 @@ import os.path
 from vocaran_tools.data import parse
 from vocaran_tools.data import dm
 from vocaran_tools.vocaloidism import get_vocaloidism
-from vocaran_tools.errors import DataException
+from vocaran_tools.errors import FileFormatException
 
 def main(*args):
 
@@ -36,7 +36,7 @@ def translate_main(week, source):
     ranks = parse.parse_vocaloidism(src)
     print('checking parsed links...')
     if parse.checklinks(ranks):
-        raise DataException('parse_vocaloidism links is incomplete.  ' + 
+        raise FileFormatException('parse_vocaloidism links is incomplete.  ' + 
             'Check source and/or parse_vocaloidism', parse.checklinks(ranks))
     print('reading song list data...')
     slist = dm.get_songlist(week)
@@ -53,6 +53,6 @@ if __name__ == '__main__':
     import sys
     try:
         main(*sys.argv[1:])
-    except DataException as e:
+    except FileFormatException as e:
         print(str(e))
         sys.exit(1)

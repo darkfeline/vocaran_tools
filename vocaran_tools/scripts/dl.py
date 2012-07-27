@@ -11,7 +11,6 @@ import urllib.error
 import hashlib
 
 from vocaran_tools.errors import ExitException, FileNotAvailableException
-from vocaran_tools.errors import DataException
 from vocaran_tools import dl
 from vocaran_tools.data import dm, songlist
 
@@ -69,7 +68,8 @@ def dlmain(week, dlf, *args):
     print('Loading song list...')
     slist = dm.get_songlist(week)
     if isinstance(slist, songlist.RankedSongList):
-        raise DataException('Translate first.')
+        print('Translate song list first')
+        raise ExitException(1)
     # personal defaults here
     for entry in slist:
         if entry.comment == '':
