@@ -10,7 +10,7 @@ import subprocess
 from vocaran_tools.scripts import parse
 from vocaran_tools.scripts import dl
 
-TESTDIR = 'test'
+TESTDIR = 'fixtures'
 TMPDIR = 'tmp'
 
 class TestFiles(unittest.TestCase):
