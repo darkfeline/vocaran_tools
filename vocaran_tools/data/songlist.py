@@ -31,6 +31,9 @@ class SongEntry:
             setattr(x, key, fpipe.readline()[:-1])
         return x
 
+    def __iter__(self):
+        return [getattr(self, x) for x in self._save]
+
     @property
     def id(self):
         return self.values['id']
