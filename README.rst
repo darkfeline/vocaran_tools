@@ -2,22 +2,23 @@
 vocaran_tools
 =============
 
-Version 1.2.2
+Version 1.3
 
 Dependencies
 ------------
 
-Both `Python`_ 3 and Python 2 are needed.  While vocaran_tools is primarily a
-Python 3 library, it relies on selenium for browser automation to download from
-nicosound.anyap.info, and selenium is currently Python 2 only.
+`Python`_ 3 is required.  Python 2 is required for spynner and selenium
+download methods.
 
 .. _Python: http://www.python.org/download/
 
-Speaking of which, `selenium`_ for Python 2 is required.
+Speaking of which, `selenium`_ for Python 2 is required., as well as `spynner`_
+for Python 2, for their respective download methods.
 
 .. _selenium: http://pypi.python.org/pypi/selenium/
+.. _spynner: https://github.com/makinacorpus/spynner
 
-`Firefox`_ should also be installed.
+`Firefox`_ should also be installed for selenium download.
 
 .. _Firefox: https://www.mozilla.org/en-US/firefox/new/
 
@@ -37,21 +38,45 @@ anyway, unless you want to run the tests yourself.
 
 .. _md5sum: https://en.wikipedia.org/wiki/Md5sum
 
+Usage
+-----
+
+From the command line::
+
+    vct
+    vct add
+    vct remove
+    vct show
+    vct tl
+    vct dl
+    vct move
+
+The program will provide additional usage information
+
 Specifications
 --------------
+
+With version 1.3, file formats and data models have been completely revamped.
+Specification information will be gradually migrated to their respective
+modules.
 
 File formats
 ````````````
 
 All files are plain text.
 
+With version 1.3, the old song list files are now merged.  Old song list files
+implicitly contain rank information.
+
 Song list files contain one song entry per line::
 
-    song_entry ::= NND_id SEP song_name [SEP artist [SEP album [SEP comment
+    song_entry ::= id SEP name [SEP artist [SEP album [SEP comment
                    [SEP apic]]]]
     SEP ::= '::'
-    NND_id ::= ('s' | 'n') ('m' | 'o') ('0' ... '9')+
-    song_name ::= <any string that doesn't contain SEP>
+    nndid ::= ('s' | 'n') ('m' | 'o') ('0' ... '9')+
+    rank ::= ['h'] ('0' .. '9')+ | 'pkp' | 'ed'
+    id ::= nndid | rank
+    name ::= <any string that doesn't contain SEP>
     artist ::= <any string that doesn't contain SEP>
     album ::= <any string that doesn't contain SEP>
     comment ::= <any string that doesn't contain SEP>
@@ -60,16 +85,13 @@ Song list files contain one song entry per line::
 
 - SEP can be changed in parse.py.
 - apic refers to albumart retrieved from nicomimi.net
-
-Song list files with ranks also take ranks in song entries::
-
-    song_entry_with_ranks ::= NND_id_with_rank SEP song_name [SEP artist [SEP
-                              album [SEP comment [SEP apic]]]]
-    NND_id_with_rank ::= NND_id | ['h'] ('0' .. '9')+ | 'pkp' | 'ed'
-
 - The ranks must correspond to a single weekly Vocaran's rankings.
-- Where song list files with ranks are allowed, "with ranks" must be explicitly
-  stated.
+
+With version 1.3, there is a new file type, currently called new song list
+files.  It corresponds to SongList and RankedSongList data models, and is saved
+and loaded by both.  RankedSongList can load all new song list files, but
+SongList can only load ones without rank information.  Its file format will not
+be explained in detail as manual editing won't be required.
 
 Data models
 ```````````
@@ -84,18 +106,13 @@ format::
     '13':'sm3', ...
     }
 
-Song lists are list representations of song list files.  They have the
-following format::
-
-    [[id, song_name, artist, album, comment, apic], ... ]
-
-- There are also song lists with ranks that represent song list files with
-  ranks.
-- Where song lists with ranks are allowed, "with ranks" must be explicitly
-  stated.
+With version 1.3, old song lists are deprecated by the new SongList and
+RankedSongList classes.  See songlist.py for documentation.
 
 Modules
 -------
+
+Module information will be gradually migrated to the corresponding modules.
 
 Note: The following is out-of-date following package restructuring and
 development of a curses user interface.  The dl.py, parse.py, and move_songs.py
