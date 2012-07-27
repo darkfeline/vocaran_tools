@@ -8,7 +8,7 @@ USAGE
 vct add
 vct dl
 vct show
-vct translate
+vct tl
 vct move
 
 """
@@ -34,8 +34,8 @@ def main(*args):
     elif args[0] == 'show':
         sys.argv[0] = 'vct show'
         show.main(*args[1:])
-    elif args[0] == 'translate':
-        sys.argv[0] = 'vct translate'
+    elif args[0] == 'tl':
+        sys.argv[0] = 'vct tl'
         translate.main(*args[1:])
     elif args[0] == 'move':
         sys.argv[0] = 'vct move_songs'
