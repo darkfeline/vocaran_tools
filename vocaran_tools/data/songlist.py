@@ -1,12 +1,17 @@
 #!/usr/bin/env python3
 
 import re
+import os
+
+from vocaran_tools.errors import FileFormatError
 
 class SongEntry:
 
     _nnid = re.compile(r'^[sn][mo][0-9]+$', re.I)
+    _save = ('id', 'name', 'artist', 'album', 'comment', 'apic')
 
-    def __init__(self, id, name, artist, album, comment, apic):
+    def __init__(self, id='sm1', name='', artist='', album='', comment='',
+            apic='none'):
         self.values = {}
         self.id = id
         self.name = name
@@ -14,7 +19,17 @@ class SongEntry:
         self.album = album
         self.comment = comment
         self.apic = apic
-        self.file = ""
+
+    def write_to(self, fpipe):
+        for key in self._save:
+            fpipe.write(getattr(self, key) + '\n')
+
+    @classmethod
+    def read_from(cls, fpipe):
+        x = cls()
+        for key in cls._save:
+            setattr(x, key, fpipe.readline()[:-1])
+        return x
 
     @property
     def id(self):
@@ -88,11 +103,48 @@ class RankedSongEntry(SongEntry):
 class SongList:
 
     entry_type = SongEntry
+    _special_str = '% {} \n'
+    _special_re = re.compile(r'^% (\w+)')
 
-    def __init__(self, week):
-        self.week = int(week)
+    def __init__(self, file, week='0'):
+        self.week = week
         self.entries = []
-        self.path = ""
+        self.file = file
+
+    @property
+    def week(self):
+        return self._week
+
+    @week.setter
+    def week(self, value):
+        self._week = int(value)
+
+    def save(self):
+        with open(self.file + '~', 'w') as f:
+            f.write(self._special_str.format(str(self.week)))
+            for entry in self.entries:
+                f.write(self._special_str.format('start_entry'))
+                entry.write_to(f)
+            f.write(self._special_str.format('end'))
+        os.rename(self.file + '~', self.file)
+
+    @classmethod
+    def load(cls, file):
+        x = cls(file)
+        with open(file, 'r') as f:
+            s = f.readline().rstrip()
+            m = cls._special_re.match(s)
+            x.week = m.group(1)
+            while True:
+                s = f.readline().rstrip()
+                m = cls._special_re.match(s)
+                if m.group(1) == 'end':
+                    break
+                elif m.group(1) == 'start_entry':
+                    x.add(cls.entry_type.read_from(f))
+                else:
+                    raise FileFormatError
+        return x
 
     def add(self, *args, **kwargs):
         entry = self.__class__.entry_type

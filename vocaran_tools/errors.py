@@ -6,9 +6,13 @@ class QuitException(Exception):
 class FileNotAvailableException(Exception):
     pass
 
-# DMExceptions
+class DataException(Exception):
+    pass
 
-class DMException(Exception):
+class FileFormatError(DataException):
+    pass
+
+class DMException(DataException):
     pass
 
 class InitException(DMException):
