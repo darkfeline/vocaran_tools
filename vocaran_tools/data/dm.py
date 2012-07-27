@@ -23,7 +23,7 @@ def mkdir(path):
         os.mkdir(path)
 
 def make_rankedsonglist(week, overwrite=False):
-    path = os.path.join(SONGLIST_DIR, str(week))
+    path = get_songlist_path(week)
     if not overwrite and os.path.isfile(path):
         raise StructureException(
                 '{} already exists and overwrite is False.'.format(path))
@@ -39,7 +39,7 @@ def get_songlist_path(week):
     return os.path.join(SONGLIST_DIR, str(week))
 
 def get_songlist(week):
-    path = os.path.join(SONGLIST_DIR, str(week))
+    path = get_songlist_path(week)
     if not os.path.isfile(path):
         raise StructureException('{} is not a file.'.format(path))
     try:
