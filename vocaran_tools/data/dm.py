@@ -21,6 +21,14 @@ def mkdir(path):
         raise StructureError('Could not make directory.')
     if not os.path.isdir(path):
         os.mkdir(path)
+def make_songlist(week, overwrite=False):
+    path = get_songlist_path(week)
+    if not overwrite and os.path.isfile(path):
+        raise StructureError(
+                '{} already exists and overwrite is False.'.format(path))
+    l = songlist.SongList(path, week)
+    return l
+
 
 def make_rankedsonglist(week, overwrite=False):
     path = get_songlist_path(week)
