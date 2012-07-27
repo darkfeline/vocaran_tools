@@ -109,8 +109,8 @@ def read_list(filename, ranks=False):
             match = idp.search(line)
             if match:
                 g = match.group
-                slist.add([g('id'), g('title'), g('artist'), g('album'),
-                               g('comment'), g('apic')])
+                slist.add(g('id'), g('title'), g('artist'), g('album'),
+                               g('comment'), g('apic'))
             else:
                 raise FileFormatError(
                     "Error when parsing {file}: {line}".format(
