@@ -78,6 +78,9 @@ def dlmain(week, dlf, *args):
             entry.apic = 'smile'
     print('Downloading...')
     dlloop(dlf, slist, dm.get_songlist_path(week), *args)
+    print('Marking song list as done...')
+    slist.done = True
+    slist.save()
     print('Done.')
 
 def dlloop(dlf, slist, path, force=False):

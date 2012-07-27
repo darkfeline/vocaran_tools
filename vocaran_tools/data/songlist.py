@@ -114,6 +114,7 @@ class SongList:
         self.week = week
         self.entries = []
         self.file = file
+        self.done = False
 
     @property
     def week(self):
@@ -126,6 +127,8 @@ class SongList:
     def save(self):
         with open(self.file + '~', 'w') as f:
             f.write(self._special_str.format(str(self.week)))
+            if self.done:
+                f.write(self._special_str.format('done'))
             for entry in self.entries:
                 f.write(self._special_str.format('start_entry'))
                 entry.write_to(f)
@@ -134,21 +137,23 @@ class SongList:
 
     @classmethod
     def load(cls, file):
-        x = cls(file)
+        slist = cls(file)
         with open(file, 'r') as f:
             s = f.readline().rstrip()
             m = cls._special_re.match(s)
-            x.week = m.group(1)
+            slist.week = m.group(1)
             while True:
                 s = f.readline().rstrip()
                 m = cls._special_re.match(s)
                 if m.group(1) == 'end':
                     break
                 elif m.group(1) == 'start_entry':
-                    x.add(cls.entry_type.read_from(f))
+                    slist.add(cls.entry_type.read_from(f))
+                elif m.group(1) == 'done':
+                    slist.done = True
                 else:
                     raise FileFormatError
-        return x
+        return slist
 
     def add(self, *args, **kwargs):
         entry = self.__class__.entry_type

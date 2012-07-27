@@ -25,12 +25,18 @@ def main(*args):
         print(str(e))
         raise ExitException(1)
 
+def print_summary(slist):
+    print("{}, {}, {} entries".format(slist.week, slist.__class__.__name__,
+        len(slist)), end="")
+    if slist.done:
+        print(", Done", end="")
+    print()
+
 def show_main(week, raw=False):
     if week is None:
         for x in dm.check_songlists():
             x = dm.get_songlist(x)
-            print("{}, {}, {} entries".format(x.week, x.__class__.__name__, 
-                len(x)))
+            print_summary(x)
     else:
         path = dm.get_songlist_path(week)
         if not os.path.isfile(path):
@@ -41,8 +47,7 @@ def show_main(week, raw=False):
                     print(line, end="")
         else:
             x = dm.get_songlist(week)
-            print("{}, {}, {} entries".format(x.week, x.__class__.__name__,
-                len(x)))
+            print_summary(x)
             for entry in x:
                 print('-' * 10)
                 print(
