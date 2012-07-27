@@ -27,8 +27,7 @@ def make_rankedsonglist(week, overwrite=False):
     if not overwrite and os.path.isfile(path):
         raise StructureException(
                 '{} already exists and overwrite is False.'.format(path))
-    l = songlist.RankedSongList(week)
-    l.file = path
+    l = songlist.RankedSongList(path, week)
     return l
 
 def check_songlists():
