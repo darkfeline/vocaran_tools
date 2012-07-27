@@ -11,6 +11,7 @@ import urllib.error
 import hashlib
 
 from vocaran_tools.errors import ExitException, FileNotAvailableError
+from vocaran_tools.errors import StructureError
 from vocaran_tools import dl
 from vocaran_tools.data import dm, songlist
 
@@ -102,6 +103,12 @@ def dlloop(dlf, slist, path, force=False):
 
     re_illegal = re.compile(r'/')
     re_error = re.compile(r'[Errno 110]')
+
+    try:
+        rejects = dm.get_songlist(0)
+    except StructureError:
+        rejects = dm.make_songlist(0)
+
     sessionfile= dm.SESSION_FILE
     # load session
     if os.path.isfile(sessionfile):
@@ -124,6 +131,7 @@ def dlloop(dlf, slist, path, force=False):
             except KeyboardInterrupt as e:
                 print('Writing current session...')
                 save_session(sessionfile, path, i - 1)
+                rejects.save()
                 raise ExitException(0)
             except urllib.error.URLError as e:
                 if re_error.search(str(e)):
@@ -132,17 +140,18 @@ def dlloop(dlf, slist, path, force=False):
                         continue
                     else:
                         save_session(sessionfile, path, i - 1)
+                        rejects.save()
                         print('URLError: exiting...')
                         raise ExitException(1)
             except FileNotAvailableError:
-                print('File not available; writing dummy file...')
-                with open(name, 'w') as f:
-                    f.write('dummy')
-                    f.close()
+                print('File not available; adding to rejects...')
+                if slist.week != 0:
+                    rejects.add(entry)
                 break
             else:
                 break
         print("Finished {} ({}/{})".format(bname, i + 1, len(slist)))
+        rejects.save()
 
 if __name__ == "__main__":
     import sys
