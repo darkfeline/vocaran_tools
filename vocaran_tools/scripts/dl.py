@@ -10,7 +10,7 @@ import urllib.parse
 import urllib.error
 import hashlib
 
-from vocaran_tools.errors import ExitException, FileNotAvailableException
+from vocaran_tools.errors import ExitException, FileNotAvailableError
 from vocaran_tools import dl
 from vocaran_tools.data import dm, songlist
 
@@ -133,7 +133,7 @@ def dlloop(dlf, slist, path, force=False):
                         save_session(sessionfile, path, i)
                         print('URLError: exiting...')
                         raise ExitException(1)
-            except FileNotAvailableException:
+            except FileNotAvailableError:
                 print('File not available; writing dummy file...')
                 break
             else:

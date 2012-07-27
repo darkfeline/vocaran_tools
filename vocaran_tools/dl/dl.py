@@ -12,7 +12,7 @@ import http.cookiejar
 import subprocess
 
 from vocaran_tools import tags
-from vocaran_tools.errors import FileNotAvailableException
+from vocaran_tools.errors import FileNotAvailableError
 
 def dl(file, id, title='', artist='', album='', comment='', apic='none'):
     """Request a custom MP3 from nicomimi.net
@@ -76,5 +76,5 @@ def dl_nicosound(file, id, title='', artist='', album='', comment='',
     selenium_path = os.path.join(dir, 'selenium_dl.py')
     return_code = subprocess.call([selenium_path, id, file])
     if return_code != 0:
-        raise FileNotAvailableException()
+        raise FileNotAvailableError()
     tags.tag(file, id, title, artist, album, comment, apic)

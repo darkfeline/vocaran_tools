@@ -8,7 +8,7 @@ show.py
 import os
 
 from vocaran_tools.data import dm
-from vocaran_tools.errors import StructureException, ExitException
+from vocaran_tools.errors import StructureError, ExitException
 
 def main(*args):
 
@@ -21,7 +21,7 @@ def main(*args):
 
     try:
         show_main(args.week, raw=args.raw)
-    except StructureException as e:
+    except StructureError as e:
         print(str(e))
         raise ExitException(1)
 
@@ -40,7 +40,7 @@ def show_main(week, raw=False):
     else:
         path = dm.get_songlist_path(week)
         if not os.path.isfile(path):
-            raise StructureException('{} is not a file.'.format(path))
+            raise StructureError('{} is not a file.'.format(path))
         if raw:
             with open(path) as f:
                 for line in f:

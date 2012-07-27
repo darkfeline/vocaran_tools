@@ -9,12 +9,12 @@ class ExitException(Exception):
         super().__init__(*args)
 
 
-class FileNotAvailableException(Exception):
+class FileNotAvailableError(Exception):
 
     """Used when download file is not available"""
 
 
-class DependencyException(Exception):
+class DependencyError(Exception):
 
     """Used when dependency is not met"""
 
@@ -29,6 +29,6 @@ class FileFormatError(DataException):
     """Used when there's a problem with file formatting"""
 
 
-class StructureException(DataException):
+class StructureError(DataException):
 
     """Used when there's a problem with data dir structure"""

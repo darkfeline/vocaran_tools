@@ -8,7 +8,7 @@ remove.py
 import os
 
 from vocaran_tools.data import dm
-from vocaran_tools.errors import StructureException, FileFormatError
+from vocaran_tools.errors import StructureError, FileFormatError
 from vocaran_tools.errors import ExitException
 
 def main(*args):
@@ -24,7 +24,7 @@ def main(*args):
 def remove_main(week):
     try:
         slist = dm.get_songlist(week)
-    except (StructureException, FileFormatError) as e:
+    except (StructureError, FileFormatError) as e:
         print(str(e))
         raise ExitException(1)
     os.remove(slist.file)

@@ -17,14 +17,14 @@ import subprocess
 import stagger
 
 from vocaran_tools.data import dm
-from vocaran_tools.errors import DependencyException
+from vocaran_tools.errors import DependencyError
 
 # check dependencies
 NULL = open(os.devnull, 'w')
 try:
     subprocess.call(['mp3info'], stdout=NULL)
 except OSError:
-    raise DependencyException('move_songs.py depends on mp3info')
+    raise DependencyError('move_songs.py depends on mp3info')
 
 ROOT = "/home/darkfeline/Music/VOCALOID"
 VOCALOIDS = [["初音ミク", "ミク"],
