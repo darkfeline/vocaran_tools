@@ -12,11 +12,5 @@ class DataException(Exception):
 class FileFormatError(DataException):
     pass
 
-class DMException(DataException):
-    pass
-
-class InitException(DMException):
-    pass
-
-class DataException(DMException):
+class StructureException(DataException):
     pass

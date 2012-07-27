@@ -3,7 +3,7 @@
 import os
 import os.path
 
-from vocaran_tools.errors import InitException, DataException
+from vocaran_tools.errors import StructureException
 from vocaran_tools.data import songlist
 from vocaran_tools import data
 
@@ -18,14 +18,14 @@ def init_dirs():
 
 def mkdir(path):
     if os.path.isfile(path):
-        raise InitException('Could not make directory.')
+        raise StructureException('Could not make directory.')
     if not os.path.isdir(path):
         os.mkdir(path)
 
 def make_rankedsonglist(week, overwrite=False):
     path = os.path.join(SONGLIST_DIR, str(week))
     if not overwrite and os.path.isfile(path):
-        raise DataException(
+        raise StructureException(
                 '{} already exists and overwrite is False.'.format(path))
     l = songlist.RankedSongList(week)
     l.file = path
@@ -39,6 +39,6 @@ def check_songlists():
 def get_songlist(week):
     path = os.path.join(SONGLIST_DIR, str(week))
     if not os.path.isfile(path):
-        raise DataException('{} is not a file.'.format(path))
+        raise StructureException('{} is not a file.'.format(path))
     l = data.load(path)
     return l
