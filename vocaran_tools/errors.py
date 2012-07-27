@@ -5,10 +5,12 @@ class ExitException(Exception):
         self.code = code
         super().__init__(*args)
 
-class FileNotAvailableException(Exception):
     pass
 
 class DataException(Exception):
+    pass
+
+class FileNotAvailableException(DataException):
     pass
 
 class FileFormatError(DataException):
