@@ -7,11 +7,11 @@ def dl(id, file):
     browser = spynner.Browser()
     browser.set_html_parser(pyquery.PyQuery)
     browser.load("http://nicosound.anyap.info/sound/{}".format(id))
-    browser.click("[id=ctl00_ContentPlaceHolder1_SoundInfo1_btnExtract2]")
     try:
-        browser.wait_load()
-    except spynner.SpynnerTimeout:
+        browser.click("[id=ctl00_ContentPlaceHolder1_SoundInfo1_btnExtract2]")
+    except spynner.SpynnerJavascriptError:
         return 1
+    browser.wait_load()
     data = browser.download(
             "http://ns5.anyap.info:8080/sound/{}.mp3".format(id))
     with open(file, 'wb') as f:
