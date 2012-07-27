@@ -5,6 +5,7 @@ class ExitException(Exception):
         self.code = code
         super().__init__(*args)
 
+class DependencyException(Exception):
     pass
 
 class DataException(Exception):

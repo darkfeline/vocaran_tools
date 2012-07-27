@@ -7,7 +7,6 @@ moves vocaloid songs according to artist tag
 
 """
 
-
 import os
 import os.path
 import re
@@ -17,12 +16,15 @@ import subprocess
 
 import stagger
 
+from vocaran_tools.data import dm
+from vocaran_tools.errors import DependencyException
+
 # check dependencies
 NULL = open(os.devnull, 'w')
 try:
     subprocess.call(['mp3info'], stdout=NULL)
 except OSError:
-    raise Exception('move_songs.py depends on mp3info')
+    raise DependencyException('move_songs.py depends on mp3info')
 
 ROOT = "/home/darkfeline/Music/VOCALOID"
 VOCALOIDS = [["初音ミク", "ミク"],
@@ -73,7 +75,7 @@ def main(*args):
 def move_main():
     """Find all MP3s in current directory by extension and run process() on
     each one."""
-    dir = os.listdir(os.getcwd())
+    dir = dm.DOWNLOAD_DIR
     p = re.compile(r".*\.mp3$", re.I)
     dir = [f for f in dir if p.match(f)]
     for f in dir:
