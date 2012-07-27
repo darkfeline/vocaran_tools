@@ -11,24 +11,35 @@ vct move
 
 """
 
-if __name__ == "__main__":
+import sys
 
-    import sys
+from vocaran_tools.scripts import add
+from vocaran_tools.scripts import dl
+from vocaran_tools.scripts import translate
+from vocaran_tools.scripts import move_songs
+from vocaran_tools.errors import ExitException
 
-    if len(sys.argv) < 2:
+def main(*args):
+    if len(args) < 1:
         print(__doc__)
-    elif sys.argv[1] == 'dl':
-        from vocaran_tools.scripts import dl
+    elif args[0] == 'add':
+        sys.argv[0] = 'vct add'
+        add.main(*args[1:])
+    elif args[0] == 'dl':
         sys.argv[0] = 'vct dl'
-        dl.main(*sys.argv[2:])
-    elif sys.argv[1] == 'parse':
-        from vocaran_tools.scripts import parse
-        sys.argv[0] = 'vct parse'
-        parse.main(*sys.argv[2:])
-    elif sys.argv[1] == 'move':
-        from vocaran_tools.scripts import move_songs
-        sys.argv[0] = 'vct move'
-        move_songs.main(*sys.argv[2:])
+        dl.main(*args[1:])
+    elif args[0] == 'translate':
+        sys.argv[0] = 'vct translate'
+        translate.main(*args[1:])
+    elif args[0] == 'move_songs':
+        sys.argv[0] = 'vct move_songs'
+        move_songs.main(*args[1:])
     else:
         print("{} is not valid.".format(sys.argv[1]))
         print(__doc__)
+
+if __name__ == "__main__":
+    try:
+        main(*sys.argv[1:])
+    except ExitException as e:
+        sys.exit(e.code)
