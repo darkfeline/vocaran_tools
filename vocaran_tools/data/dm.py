@@ -9,6 +9,7 @@ from vocaran_tools.data import songlist
 DATA_DIR = os.path.join(os.environ['HOME'], '.vocaran_tools')
 SONGLIST_DIR = os.path.join(DATA_DIR, 'songlists')
 DOWNLOAD_DIR = os.path.join(DATA_DIR, 'downloads')
+SESSION_FILE = os.path.join(DATA_DIR, 'session')
 
 def init_dirs():
     mkdir(DATA_DIR)
