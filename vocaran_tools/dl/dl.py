@@ -89,7 +89,8 @@ def dl_nicosound_spynner(file, id, title='', artist='', album='', comment='',
     """
     dir = os.path.dirname(__file__)
     path = os.path.join(dir, 'spynner_dl.py')
-    return_code = subprocess.call([path, id, file])
+    with open(os.devnull, 'wb') as f:
+        return_code = subprocess.call([path, id, file], stdout=f, stderr=f)
     if return_code != 0:
         raise FileNotAvailableError()
     tags.tag(file, id, title, artist, album, comment, apic)
