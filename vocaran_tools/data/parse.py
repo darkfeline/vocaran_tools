@@ -3,6 +3,9 @@
 """
 parse.py
 
+This module handles some parsing and especially parsing old-style song list
+files, translating them into SongList and RankedSongList objects.
+
 """
 
 import re

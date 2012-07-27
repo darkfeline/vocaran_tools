@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
 
+"""
+songlist.py
+
+This module holds class definitions for SongList classes and related classes.
+
+"""
+
 import re
 import os
 

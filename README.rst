@@ -51,7 +51,33 @@ From the command line::
     vct dl
     vct move
 
-The program will provide additional usage information
+Example:
+
+Make a song list file ``list``::
+
+    30::hello world!::artistP feat. miku::this album::comments
+
+Add the file, noting the week of the Vocaran (vocaran_tools data is kept in
+``$HOME/.vocaran_tools``.  Stored song lists are in ``songlists``)::
+
+    vct add 113 list
+
+Check added weeks::
+
+    vct show
+
+Translate the ranks::
+
+    vct tl 113
+
+Download your songs (Songs are downloaded to ``downloads``)::
+
+    vct dl 113
+
+Move them to your collection (Edit ``vocaran_tools/scripts/move_songs.py`` with
+your music directory)::
+
+    vct move
 
 Specifications
 --------------
@@ -86,6 +112,28 @@ Song list files contain one song entry per line::
 - SEP can be changed in parse.py.
 - apic refers to albumart retrieved from nicomimi.net
 - The ranks must correspond to a single weekly Vocaran's rankings.
+
+Or in English::
+
+    id::song_name::artist::album::comment::albumart
+
+- id is the NND id of the song.  Rank interpretation has been moved to
+  parse.py.
+- song_name (TIT2) will be used to tag the song; optional.
+- artist (TPE1) will be used to tag the song; optional.
+- album (TALB) will be used to tag the song; optional.
+- comment (COMM) will be used to tag the song; optional.  Defaults to the NND
+  id of the song.
+- albumart (APIC) will be used to choose the attached picture.  Check the
+  docstrings for tag() and getpic() in dl.py for more information.  Defaults to
+  'smile'.
+
+- The default field separator is '::', as it is unlikely to appear in the title
+  of a song.  This can be changed, for now, by editing parse.py (dl.py uses
+  parse.py for any parsing fuctions)::
+
+    #SEP = "::"
+    SEP = "@@"
 
 With version 1.3, there is a new file type, currently called new song list
 files.  It corresponds to SongList and RankedSongList data models, and is saved
@@ -122,35 +170,6 @@ work as per the following.
 dl.py
 `````
 
-dl.py facilitates bulk downloading of Nico Nico Douga (NND) songs through
-nicomimi.net.  It no longer translates rank numbers into NNDIDs; this
-functionality is now in parse.py.  Run dl.py from the command line::
-
-    dl.py list
-
-list is a song list file, containing the songs to download and relevant
-information, one per line in the following format::
-
-    id::song_name::artist::album::comment::albumart
-
-- id is the NND id of the song.  Rank interpretation has been moved to
-  parse.py.
-- song_name (TIT2) will be used to tag the song; optional.
-- artist (TPE1) will be used to tag the song; optional.
-- album (TALB) will be used to tag the song; optional.
-- comment (COMM) will be used to tag the song; optional.  Defaults to the NND
-  id of the song.
-- albumart (APIC) will be used to choose the attached picture.  Check the
-  docstrings for tag() and getpic() in dl.py for more information.  Defaults to
-  'smile'.
-
-- The default field separator is '::', as it is unlikely to appear in the title
-  of a song.  This can be changed, for now, by editing parse.py (dl.py uses
-  parse.py for any parsing fuctions)::
-
-    #SEP = "::"
-    SEP = "@@"
-
 dl functions
 ''''''''''''
 
@@ -186,37 +205,3 @@ a growing song list file.
 
 number can either be the week number, or the name of a file containing the HTML
 source downloaded from the respective Vocaloidism page.
-
-move_songs.py
-`````````````
-
-move_songs.py automates moving downloaded songs into your music directory.
-Edit move_songs.py and change::
-    
-    ROOT = "/home/darkfeline/Music/VOCALOID"
-
-to your own music directory.  The assumed directory structure is thus: songs
-sung by a single VOCALOID are moved into their own subdirectory, and songs sung
-by more than one VOCALOID are moved into the root directory.  move_songs.py
-will parse each song's artist tag and select a destination directory, prompting
-for confirmation.  If it cannot guess, it will prompt you to manually select a
-directory.  
-
-Additionally, move_songs.py will check for corrupt downloads (when the song is
-less than a certain size), and prompt to skip.  These generally result from
-when the song is not available via the selected dl function, yielding an html
-error page instead of a valid mp3 file.
-
-vocaran_tools.py
-````````````````
-
-This is currently just a wrapper script for the above modules.  Calling::
-
-    vocaran_tools.py dl foo bar
-
-is identical to:::
-
-    dl.py foo bar
-
-and 'parse' to parse.py, 'move' to move_songs.py.  Eventually, all of these
-scripts will be moved to vocaran_tools.py.

@@ -3,6 +3,9 @@
 """
 dl.py
 
+This module holds dl functions and wrapper functions for Python 2 download
+methods.
+
 """
 
 import os

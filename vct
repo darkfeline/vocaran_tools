@@ -12,6 +12,9 @@ vct tl
 vct move
 vct rm
 
+vct is a python wrapper script which calls the modules in
+vocaran_tools.scripts.  See respective modules for details.
+
 """
 
 import sys

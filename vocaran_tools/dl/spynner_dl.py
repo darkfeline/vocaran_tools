@@ -1,5 +1,13 @@
 #!/usr/bin/env python2
 
+"""
+spynner_dl.py
+
+Script for using spynner to download from nicosound.  Don't use directly; use
+wrapper function instead.
+
+"""
+
 import os
 import shutil
 
