@@ -75,7 +75,8 @@ def main(*args):
 def move_main():
     """Find all MP3s in current directory by extension and run process() on
     each one."""
-    dir = dm.DOWNLOAD_DIR
+    os.chdir(dm.DOWNLOAD_DIR)
+    dir = os.listdir()
     p = re.compile(r".*\.mp3$", re.I)
     dir = [f for f in dir if p.match(f)]
     for f in dir:
