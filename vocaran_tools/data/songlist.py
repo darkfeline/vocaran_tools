@@ -172,6 +172,9 @@ class SongList:
     def __iter__(self):
         return iter(self.entries)
 
+    def __len__(self):
+        return len(self.entries)
+
 
 class RankedSongList(SongList):
 
