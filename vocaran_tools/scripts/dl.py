@@ -45,7 +45,8 @@ def main(*args):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('-f', dest='force', action='store_true', default=False)
     parser.add_argument('-m', '--method', dest='method', action='store',
-            choices=('dl_nicomimi', 'dl_nicosound'), default='dl_nicosound')
+            choices=('dl_nicomimi', 'dl_nicosound_selenium',
+                'dl_nicosound_spynner'), default='dl_nicosound_spynner')
     parser.add_argument('week', type=int)
     args = parser.parse_args(args)
 

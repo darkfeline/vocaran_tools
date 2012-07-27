@@ -64,7 +64,7 @@ def dl_nicomimi(file, id, title='', artist='', album='', comment='',
     conn.close()
     tags.tag(file, id, title, artist, album, comment, apic)
 
-def dl_nicosound(file, id, title='', artist='', album='', comment='',
+def dl_nicosound_selenium(file, id, title='', artist='', album='', comment='',
         apic='none'):
     """Download MP3 from nicosound using selenium, then tag using stagger.
 
@@ -75,6 +75,21 @@ def dl_nicosound(file, id, title='', artist='', album='', comment='',
     dir = os.path.dirname(__file__)
     selenium_path = os.path.join(dir, 'selenium_dl.py')
     return_code = subprocess.call([selenium_path, id, file])
+    if return_code != 0:
+        raise FileNotAvailableError()
+    tags.tag(file, id, title, artist, album, comment, apic)
+
+def dl_nicosound_spynner(file, id, title='', artist='', album='', comment='',
+        apic='none'):
+    """Download MP3 from nicosound using spynner, then tag using stagger.
+
+    file should probably match the title and end in '.mp3' as the right
+    extension.  See getpic() and tag() for information about apic.
+
+    """
+    dir = os.path.dirname(__file__)
+    path = os.path.join(dir, 'spynner_dl.py')
+    return_code = subprocess.call([path, id, file])
     if return_code != 0:
         raise FileNotAvailableError()
     tags.tag(file, id, title, artist, album, comment, apic)
