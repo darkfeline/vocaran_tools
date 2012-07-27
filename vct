@@ -10,6 +10,7 @@ vct dl
 vct show
 vct tl
 vct move
+vct rm
 
 """
 
@@ -20,6 +21,7 @@ from vocaran_tools.scripts import dl
 from vocaran_tools.scripts import show
 from vocaran_tools.scripts import translate
 from vocaran_tools.scripts import move_songs
+from vocaran_tools.scripts import remove
 from vocaran_tools.errors import ExitException
 
 def main(*args):
@@ -37,6 +39,9 @@ def main(*args):
     elif args[0] == 'tl':
         sys.argv[0] = 'vct tl'
         translate.main(*args[1:])
+    elif args[0] == 'rm':
+        sys.argv[0] = 'vct rm'
+        remove.main(*args[1:])
     elif args[0] == 'move':
         sys.argv[0] = 'vct move'
         move_songs.main(*args[1:])
