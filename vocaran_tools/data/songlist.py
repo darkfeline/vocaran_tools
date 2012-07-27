@@ -94,7 +94,7 @@ class SongEntry:
 
 class RankedSongEntry(SongEntry):
 
-    _rank = re.compile(r'^h[0-9]+|ed|pkp?', re.I)
+    _rank = re.compile(r'^h?[0-9]+|ed|pkp$', re.I)
 
     @property
     def id(self):
@@ -103,7 +103,7 @@ class RankedSongEntry(SongEntry):
     @id.setter
     def id(self, value):
         if self._rank.match(value):
-            super().values['id'] = value
+            self.values['id'] = value
         else:
             try:
                 super(RankedSongEntry, self.__class__).id.fset(self, value)
