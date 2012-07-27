@@ -1,9 +1,18 @@
 #!/usr/bin/env python2
 
+import os
+import shutil
+
 import spynner
 import pyquery
 
+TMPDIR = 'tmp'
+
 def dl(id, file):
+
+    os.mkdir(TMPDIR)
+    os.chdir(TMPDIR)
+
     browser = spynner.Browser()
     browser.set_html_parser(pyquery.PyQuery)
     browser.load("http://nicosound.anyap.info/sound/{}".format(id))
@@ -28,7 +37,9 @@ def main(*args):
     parser.add_argument('filename')
     args = parser.parse_args(args)
 
-    return dl(args.id, args.filename)
+    code = dl(args.id, args.filename)
+    shutil.rmtree(TMPDIR)
+    return code
 
 if __name__ == "__main__":
     import sys
