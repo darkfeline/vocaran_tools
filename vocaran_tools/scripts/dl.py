@@ -115,9 +115,9 @@ def dlloop(dlf, slist, path, force=False):
     for i, entry in enumerate(slist):
         if i < j:
             continue
-        name = entry.name + '.mp3'
-        name = re_illegal.sub('|', name)
-        print("Fetching {} ({}/{})".format(name, i + 1, len(slist)))
+        bname = re_illegal.sub('|', entry.name) + '.mp3'
+        name = os.path.join(dm.DOWNLOAD_DIR, bname)
+        print("Fetching {} ({}/{})".format(bname, i + 1, len(slist)))
         while True:
             try:
                 dlf(name, *entry)
@@ -142,7 +142,7 @@ def dlloop(dlf, slist, path, force=False):
                 break
             else:
                 break
-        print("Finished {} ({}/{})".format(name, i + 1, len(slist)))
+        print("Finished {} ({}/{})".format(bname, i + 1, len(slist)))
 
 if __name__ == "__main__":
     import sys
