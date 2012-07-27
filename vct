@@ -38,7 +38,7 @@ def main(*args):
         sys.argv[0] = 'vct tl'
         translate.main(*args[1:])
     elif args[0] == 'move':
-        sys.argv[0] = 'vct move_songs'
+        sys.argv[0] = 'vct move'
         move_songs.main(*args[1:])
     else:
         print("{} is not valid.".format(sys.argv[1]))
