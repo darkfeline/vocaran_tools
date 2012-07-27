@@ -74,10 +74,6 @@ def dl(id, name):
             'ctl00_ContentPlaceHolder1_SoundInfo1_btnExtract2'))
     except TimeoutException:
         driver.quit()
-        # write a dummy file
-        with open(name, 'w') as f:
-            f.write('dummy')
-            f.close()
         shutil.rmtree(TMPDIR)
         return 1
 

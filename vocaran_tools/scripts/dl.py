@@ -136,6 +136,9 @@ def dlloop(dlf, slist, path, force=False):
                         raise ExitException(1)
             except FileNotAvailableError:
                 print('File not available; writing dummy file...')
+                with open(name, 'w') as f:
+                    f.write('dummy')
+                    f.close()
                 break
             else:
                 break
