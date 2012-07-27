@@ -5,8 +5,10 @@ vct
 
 USAGE
 
+vct add
 vct dl
-vct parse
+vct show
+vct translate
 vct move
 
 """
@@ -15,6 +17,7 @@ import sys
 
 from vocaran_tools.scripts import add
 from vocaran_tools.scripts import dl
+from vocaran_tools.scripts import show
 from vocaran_tools.scripts import translate
 from vocaran_tools.scripts import move_songs
 from vocaran_tools.errors import ExitException
@@ -28,10 +31,13 @@ def main(*args):
     elif args[0] == 'dl':
         sys.argv[0] = 'vct dl'
         dl.main(*args[1:])
+    elif args[0] == 'show':
+        sys.argv[0] = 'vct show'
+        show.main(*args[1:])
     elif args[0] == 'translate':
         sys.argv[0] = 'vct translate'
         translate.main(*args[1:])
-    elif args[0] == 'move_songs':
+    elif args[0] == 'move':
         sys.argv[0] = 'vct move_songs'
         move_songs.main(*args[1:])
     else:
