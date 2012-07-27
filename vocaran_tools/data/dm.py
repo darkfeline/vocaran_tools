@@ -5,7 +5,6 @@ import os.path
 
 from vocaran_tools.errors import StructureException
 from vocaran_tools.data import songlist
-from vocaran_tools import data
 
 DATA_DIR = os.path.join(os.environ['HOME'], '.vocaran_tools')
 SONGLIST_DIR = os.path.join(DATA_DIR, 'songlists')
@@ -35,9 +34,15 @@ def check_songlists():
     x.sort()
     return x
 
+def get_songlist_path(week):
+    return os.path.join(SONGLIST_DIR, str(week))
+
 def get_songlist(week):
     path = os.path.join(SONGLIST_DIR, str(week))
     if not os.path.isfile(path):
         raise StructureException('{} is not a file.'.format(path))
-    l = data.load(path)
-    return l
+    try:
+        slist = songlist.SongList.load(path)
+    except TypeError:
+        slist = songlist.RankedSongList.load(path)
+    return slist
