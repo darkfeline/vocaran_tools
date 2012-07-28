@@ -18,8 +18,8 @@ def main(*args):
     import argparse
 
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('week', type='int')
-    parser.add_argument('-s', '--source', action='store', type='str')
+    parser.add_argument('week', type=int)
+    parser.add_argument('-s', '--source', action='store', type=str)
     args = parser.parse_args(args)
 
     translate_main(args.week, args.source)
