@@ -12,7 +12,6 @@ import os
 import shutil
 
 import spynner
-import pyquery
 
 TMPDIR = 'tmp'
 
@@ -22,7 +21,6 @@ def dl(id, file):
     os.chdir(TMPDIR)
 
     browser = spynner.Browser()
-    browser.set_html_parser(pyquery.PyQuery)
     browser.load("http://nicosound.anyap.info/sound/{}".format(id))
     try:
         browser.click("[id=ctl00_ContentPlaceHolder1_SoundInfo1_btnExtract2]")
