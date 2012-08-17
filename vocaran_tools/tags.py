@@ -15,27 +15,57 @@ import urllib.error
 import stagger
 from stagger.id3 import *
 
-def tag(file, id, title='', artist='', album='', comment='', apic='none'):
-    """Tag the MP3 file using stagger.  
-    
-    comment is tagged as COMM, as opposed to USLT that nicomimi.net custom uses
-    for comments/lyrics.  
+def atag(file, id, apic='none', **kwargs):
+    """Download albumart then pass to tag()
     
     file should probably match the title and end in '.mp3' as the right
     extension.  See getpic for information about apic.  Additionally, if apic
     is 'none', no picture is tagged.
     
     """
+    if apic != 'none':
+        pic = file + '.jpg'
+        getpic(pic, id, apic)
+    else:
+        pic = None
+    tag(file, picture=pic, **kwargs)
+    if pic:
+        os.remove(pic)
+
+def tag(file, title='', artist='', album='', comment='', picture=None,
+        composer='', lyricist='', lyrics='', bpm='', key='', languages='',
+        length='', orig_artist='', orig_album=''):
+    """Tag MP3 file using stagger"""
     t = stagger.default_tag()
     t._filename = file
-    t[TIT2] = title
-    t[TPE1] = artist
-    t[TALB] = album
-    t[USLT] = USLT(text=comment)
-    if apic != 'none':
-        getpic(file + '.jpg', id, apic)
-        t[APIC] = APIC(file + '.jpg')
-        os.remove(file + '.jpg')
+    if title:
+        t[TIT2] = title
+    if artist:
+        t[TPE] = artist
+    if album:
+        t[TALB] = album
+    if comment:
+        t[COMM] = comment
+    if picture:
+        t[APIC] = APIC(picture)
+    if composer:
+        t[TCOM] = composer
+    if lyricist:
+        t[TEXT] = lyricist
+    if lyrics:
+        t[USLT] = USLT(text=lyrics)
+    if bpm:
+        t[TBPM] = bpm
+    if key:
+        t[TKEY] = key
+    if languages:
+        t[TLAN] = languages
+    if length:
+        t[TLEN] = length
+    if orig_artist:
+        t[TOPE] = orig_artist
+    if orig_album:
+        t[TOAL] = orig_album
     t.write()
 
 def getpic(file, id, apic):

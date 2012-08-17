@@ -86,7 +86,7 @@ def dl_nicomimi(file, id, title='', artist='', album='', comment='',
     with open(file, 'wb') as f:
         f.write(data)
     conn.close()
-    tags.tag(file, id, title, artist, album, comment, apic)
+    tags.atag(file, id, title, artist, album, comment, apic)
 
 def dl_nicosound_selenium(file, id, title='', artist='', album='', comment='',
         apic='none'):
@@ -101,7 +101,7 @@ def dl_nicosound_selenium(file, id, title='', artist='', album='', comment='',
     return_code = subprocess.call([selenium_path, id, file])
     if return_code != 0:
         raise FileNotAvailableError()
-    tags.tag(file, id, title, artist, album, comment, apic)
+    tags.atag(file, id, title, artist, album, comment, apic)
 
 def dl_nicosound_spynner(file, id, title='', artist='', album='', comment='',
         apic='none'):
@@ -117,4 +117,4 @@ def dl_nicosound_spynner(file, id, title='', artist='', album='', comment='',
         return_code = subprocess.call([path, id, file], stdout=f, stderr=f)
     if return_code != 0:
         raise FileNotAvailableError()
-    tags.tag(file, id, title, artist, album, comment, apic)
+    tags.atag(file, id, title, artist, album, comment, apic)
