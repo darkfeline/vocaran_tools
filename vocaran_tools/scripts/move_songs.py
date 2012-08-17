@@ -3,7 +3,22 @@
 """
 move_songs.py
 
-moves vocaloid songs according to artist tag
+move_songs.py automates moving downloaded songs into your music directory.
+Change::
+
+    ROOT = "/home/darkfeline/Music/VOCALOID"
+
+to your own music directory.  The assumed directory structure is thus: songs
+sung by a single VOCALOID are moved into their own subdirectory, and songs sung
+by more than one VOCALOID are moved into the root directory.  move_songs.py
+will parse each song's artist tag and select a destination directory, prompting
+for confirmation.  If it cannot guess, it will prompt you to manually select a
+directory.
+
+Additionally, move_songs.py will check for corrupt downloads (when the song is
+less than a certain size), and prompt to skip.  These generally result from
+when the song is not available via the selected dl function, yielding an html
+error page instead of a valid mp3 file.
 
 """
 
@@ -75,7 +90,8 @@ def main(*args):
 def move_main():
     """Find all MP3s in current directory by extension and run process() on
     each one."""
-    dir = dm.DOWNLOAD_DIR
+    os.chdir(dm.DOWNLOAD_DIR)
+    dir = os.listdir()
     p = re.compile(r".*\.mp3$", re.I)
     dir = [f for f in dir if p.match(f)]
     for f in dir:
