@@ -5,6 +5,30 @@ songlist.py
 
 This module holds class definitions for SongList classes and related classes.
 
+SongList file format
+--------------------
+
+::
+
+    file ::= header song_entry* stop
+    header ::= week_number [is_done]
+
+    week_number ::= '% ' ('0' ... '9')+ ' \\n'
+    is_done ::= '% done \\n'
+    entry_start ::= '% start_entry \\n'
+    stop ::= '% end \\n'
+
+    song_entry ::= entry_start id name artist album comment apic
+    nndid ::= ('s' | 'n') ('m' | 'o') ('0' ... '9')+ '\\n'
+    rank ::= (['h'] ('0' .. '9')+ | 'pkp' | 'ed') '\\n'
+    id ::= (nndid | rank) '\\n'
+    name ::= <any string that doesn't contain '\\n'>
+    artist ::= <any string that doesn't contain '\\n'>
+    album ::= <any string that doesn't contain '\\n'>
+    comment ::= <any string that doesn't contain '\\n'>
+    apic ::= ('none' | 'smile' | 'def' | <arbitrary set of strings of integers,
+             e.g. '1', '2', '3' ...>) '\\n'
+
 """
 
 import re

@@ -6,6 +6,23 @@ dl.py
 This module holds dl functions and wrapper functions for Python 2 download
 methods.
 
+dl functions
+------------
+
+dl.py contains various dl functions which are passed to dlloop to use to
+download the songs.  Read the docstrings for the functions for details on each.
+
+You can also write custom dl functions if you should need to.  dl function
+names should start with dl, and take the same arguments as the base dl
+function::
+
+    def dl(file, id, title, artist, album='', comment='', apic='none'):
+
+The function returns nothing, and has the end state of a file with the given
+name created in the current directory which is the MP3 of the corresponding
+video on Nico Nico Douga, and tagged accordingly.
+
+
 """
 
 import os

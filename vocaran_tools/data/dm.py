@@ -8,6 +8,77 @@ to interact with vocaran_tools data files and directories.  Both
 package-interior and package-exterior modules should use dm, instead of playing
 with paths and files themselves.
 
+File formats
+------------
+
+All files are plain text.
+
+With version 1.3, the old song list files are now merged.  Old song list files
+implicitly contain rank information.
+
+Old song list files contain one song entry per line::
+
+    song_entry ::= id SEP name [SEP artist [SEP album [SEP comment
+                   [SEP apic]]]]
+    SEP ::= '::'
+    nndid ::= ('s' | 'n') ('m' | 'o') ('0' ... '9')+
+    rank ::= ['h'] ('0' .. '9')+ | 'pkp' | 'ed'
+    id ::= nndid | rank
+    name ::= <any string that doesn't contain SEP>
+    artist ::= <any string that doesn't contain SEP>
+    album ::= <any string that doesn't contain SEP>
+    comment ::= <any string that doesn't contain SEP>
+    apic ::= 'none' | 'smile' | 'def' | <arbitrary set of strings of integers,
+             e.g. '1', '2', '3' ...>
+
+- SEP can be changed in parse.py.
+- apic refers to albumart retrieved from nicomimi.net
+- The ranks must correspond to a single weekly Vocaran's rankings.
+
+Or in English::
+
+    id::song_name::artist::album::comment::albumart
+
+- id is the NND id of the song.  Rank interpretation has been moved to
+  parse.py.
+- song_name (TIT2) will be used to tag the song; optional.
+- artist (TPE1) will be used to tag the song; optional.
+- album (TALB) will be used to tag the song; optional.
+- comment (COMM) will be used to tag the song; optional.  Defaults to the NND
+  id of the song.
+- albumart (APIC) will be used to choose the attached picture.  Check the
+  docstrings for tag() and getpic() in dl.py for more information.  Defaults to
+  'smile'.
+
+- The default field separator is '::', as it is unlikely to appear in the title
+  of a song.  This can be changed, for now, by editing parse.py (dl.py uses
+  parse.py for any parsing fuctions)::
+
+    #SEP = "::"
+    SEP = "@@"
+
+With version 1.3, there is a new file type, currently called new song list
+files.  It corresponds to SongList and RankedSongList data models, and is saved
+and loaded by both.  RankedSongList can load all new song list files, but
+SongList can only load ones without rank information.  Refer to songlist.py for
+details on the file format.
+
+Data models
+-----------
+
+Song rank dictionaries map rankings to NND ids.  They have the following
+format::
+
+    {'rank number':'sm123456789',
+    'h5':'nm123456789',
+    'pkp':'sm1',
+    'ed':'sm2',
+    '13':'sm3', ...
+    }
+
+With version 1.3, old song lists are deprecated by the new SongList and
+RankedSongList classes.  See songlist.py for documentation.
+
 """
 
 import os

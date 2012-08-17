@@ -4,7 +4,7 @@
 move_songs.py
 
 move_songs.py automates moving downloaded songs into your music directory.
-Edit move_songs.py and change::
+Change::
 
     ROOT = "/home/darkfeline/Music/VOCALOID"
 
