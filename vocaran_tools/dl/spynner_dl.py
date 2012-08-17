@@ -9,22 +9,30 @@ wrapper function instead.
 """
 
 import os
+import os.path
 import shutil
 
 import spynner
 
-TMPDIR = 'tmp'
+TMPDIR = 'tmp{}'
 
 def dl(id, file):
 
-    os.mkdir(TMPDIR)
-    os.chdir(TMPDIR)
+    tmp = TMPDIR.format('')
+    i = 0
+    while os.path.exists(tmp):
+        i += 1
+        tmp = TMPDIR.format(i)
+    os.mkdir(tmp)
+    os.chdir(tmp)
 
     browser = spynner.Browser()
     browser.load("http://nicosound.anyap.info/sound/{}".format(id))
     try:
         browser.click("[id=ctl00_ContentPlaceHolder1_SoundInfo1_btnExtract2]")
     except spynner.SpynnerJavascriptError:
+        os.chdir('..')
+        shutil.rmtree(tmp)
         return 1
     browser.wait_load()
     data = browser.download(
@@ -32,6 +40,8 @@ def dl(id, file):
     with open(file, 'wb') as f:
         f.write(data)
     browser.close()
+    os.chdir('..')
+    shutil.rmtree(tmp)
     return 0
 
 def main(*args):
@@ -44,7 +54,6 @@ def main(*args):
     args = parser.parse_args(args)
 
     code = dl(args.id, args.filename)
-    shutil.rmtree(TMPDIR)
     return code
 
 if __name__ == "__main__":

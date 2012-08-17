@@ -16,7 +16,7 @@ from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import TimeoutException
 
-TMPDIR = "tmp"
+TMPDIR = "tmp{}"
 
 def is_mp3(name):
     """Check if string is a valid MP3 name
@@ -54,14 +54,17 @@ def dl(id, name):
     
     Returns 0 if all went well, 1 otherwise."""
 
-    if not os.path.isdir(TMPDIR):
-        os.mkdir(TMPDIR)
+    tmp = TMPDIR.format('')
+    i = 0
+    while os.path.exists(tmp):
+        i += 1
+        tmp = TMPDIR.format(i)
+    os.mkdir(tmp)
 
     fp = webdriver.FirefoxProfile()
     fp.set_preference("browser.download.folderList", 2)
     fp.set_preference("browser.download.manager.showWhenStarting", False)
-    fp.set_preference("browser.download.dir", os.path.join(os.getcwd(),
-        TMPDIR))
+    fp.set_preference("browser.download.dir", os.path.join(os.getcwd(), tmp))
     fp.set_preference("browser.helperApps.neverAsk.saveToDisk", "audio/mp3")
     fp.set_preference("browser.download.manager.showAlertOnComplete", False)
 
@@ -74,7 +77,7 @@ def dl(id, name):
             'ctl00_ContentPlaceHolder1_SoundInfo1_btnExtract2'))
     except TimeoutException:
         driver.quit()
-        shutil.rmtree(TMPDIR)
+        shutil.rmtree(tmp)
         return 1
 
     x = driver.find_element_by_id(
@@ -85,21 +88,21 @@ def dl(id, name):
 
     while 1:
         time.sleep(2)
-        song = filter(is_part, os.listdir(TMPDIR))
+        song = filter(is_part, os.listdir(tmp))
         if len(song) == 0:
             break
 
     driver.quit()
 
-    song = filter(is_mp3, os.listdir(TMPDIR))
+    song = filter(is_mp3, os.listdir(tmp))
     if len(song) != 1:
         raise Exception('Something is wrong.  ' + str(len(song)) + ' files in '
-                + TMPDIR)
+                + tmp)
     song = song[0]
     name = name
-    shutil.move(os.path.join(TMPDIR, song), name)
+    shutil.move(os.path.join(tmp, song), name)
 
-    shutil.rmtree(TMPDIR)
+    shutil.rmtree(tmp)
     return 0
 
 def main(*args):
@@ -111,10 +114,7 @@ def main(*args):
     parser.add_argument('filename')
     args = parser.parse_args(args)
 
-    try:
-        return dl(args.id, args.filename)
-    except KeyboardInterrupt as e:
-        shutil.rmtree(TMPDIR)
+    return dl(args.id, args.filename)
 
 if __name__ == "__main__":
     import sys
