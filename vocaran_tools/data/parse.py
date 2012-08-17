@@ -3,9 +3,15 @@
 """
 parse.py
 
+This module handles some parsing and especially parsing old-style song list
+files, translating them into SongList and RankedSongList objects.
+
 """
 
 import re
+
+from vocaran_tools.data import songlist
+from vocaran_tools.errors import FileFormatError
 
 SEP = "::"
 NNDID = '[sn][mo][0-9]+'
@@ -67,13 +73,12 @@ def checklinks(song_ranks):
                    ['h{}'.format(i) for i in range(1,6)] + ['pkp', 'ed'])
     return expected - given
 
-def convert_list(fields, song_ranks):
+def convert_list(slist, song_ranks):
     """Convert the song list with ranks into a song list."""
     rank = re.compile(r'h?[0-9]+|ed|pkp', re.I)
-    for entry in fields:
-        if rank.match(entry[0]):
-            entry[0] = song_ranks[entry[0].lower()]
-    return fields
+    for entry in slist:
+        if rank.match(entry.id):
+            entry.id = song_ranks[entry.id.lower()]
 
 def read_list(filename, ranks=False):
 
@@ -84,6 +89,11 @@ def read_list(filename, ranks=False):
     
     """
 
+    if ranks == True:
+        slist = songlist.RankedSongList()
+    else:
+        slist = songlist.SongList()
+
     # regex magic follows
     sep = r'(?:{})'.format(SEP)
     rank = ''
@@ -91,10 +101,9 @@ def read_list(filename, ranks=False):
         rank = r'|h?[0-9]+|ed|pkp'
     idp = re.compile(sep.join([r'^(?P<id>{})'.format(NNDID + rank),
         r'(?P<title>.*?)', r'(?P<artist>.*?)', r'(?P<album>.*?)',
-        r'(?P<comment>.*?)', r'(?P<albumart>.*?)']), re.I) 
+        r'(?P<comment>.*?)', r'(?P<apic>.*?)']), re.I) 
     s = re.compile(SEP)
 
-    fields = []
     with open(filename) as src:
         for line in src:
             # pad out SEPs
@@ -103,21 +112,10 @@ def read_list(filename, ranks=False):
             match = idp.search(line)
             if match:
                 g = match.group
-                fields.append([g('id'), g('title'), g('artist'), g('album'),
-                               g('comment'), g('albumart')])
+                slist.add(g('id'), g('title'), g('artist'), g('album'),
+                               g('comment'), g('apic'))
             else:
-                raise Exception("Error when parsing {file}: {line}".format(
-                    file=filename, line=line))
-    return fields
-
-def write_list(fields, filename):
-    """Writes a song list to a song list file."""
-    with open(filename, 'w') as f:
-        for item in fields:
-            line = ""
-            for x in item:
-                line += x
-                line += SEP
-            line = line[:len(line) - len(SEP)] # cut off final SEP
-            line += '\n'
-            f.write(line)
+                raise FileFormatError(
+                    "Error when parsing {file}: {line}".format(
+                        file=filename, line=line))
+    return slist
