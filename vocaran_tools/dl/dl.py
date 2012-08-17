@@ -35,7 +35,9 @@ from vocaran_tools import tags
 from vocaran_tools.errors import FileNotAvailableError
 
 def dl(file, id, title='', artist='', album='', comment='', apic='none'):
-    """Request a custom MP3 from nicomimi.net
+    """Deprecated.
+
+    Request a custom MP3 from nicomimi.net
 
     file should probably match the title and end in '.mp3' as the right
     extension.  See getpic() and tag() for information about apic.
@@ -66,7 +68,9 @@ def dl(file, id, title='', artist='', album='', comment='', apic='none'):
 
 def dl_nicomimi(file, id, title='', artist='', album='', comment='',
         apic='none'):
-    """Request an MP3 download from nicomimi.net, then tag using stagger.
+    """Deprecated.
+
+    Request an MP3 download from nicomimi.net, then tag using stagger.
 
     file should probably match the title and end in '.mp3' as the right
     extension.  See getpic() and tag() for information about apic.
