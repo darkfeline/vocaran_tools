@@ -18,9 +18,8 @@ NNDID = '[sn][mo][0-9]+'
 
 def parse_vocaloidism(source):
     """Return a song rank dict parsed from Vocaloidism ranking page.
-    
-    source should be the path to a file containing the html source of the
-    relevant Vocaloidism weekly ranking page.
+
+    source should be a file object containing the html source
 
     """
     wvr = re.compile(r'<strong>.*?([0-9]+).*?www\.nicovideo\.jp/watch/' +
@@ -32,33 +31,32 @@ def parse_vocaloidism(source):
                        '({})'.format(NNDID), re.I)
     song_ranks = {}
     switch = 0
-    with open(source) as src:
-        for line in src:
-            # check for pickup song match
-            if wvrpkp.search(line):
-                match = wvrpkp.search(line)
-                song_ranks['pkp'] = match.group(1)
-            # check for ed song match
-            elif wvred.search(line):
-                match = wvred.search(line)
-                song_ranks['ed'] = match.group(1)
-            # scan line for song
-            elif wvr.search(line):
-                match = wvr.search(line)
-                a = match.group(1)
-                # history
-                if switch == 1:
-                    # line is in history section, prepend number with 'h'.  If
-                    # it's the last song (#1), go back to regular ranking
-                    if a == "1":
-                        switch = 2
-                    a = 'h' + a
-                song_ranks[a] = match.group(2)
-            # check for start of history section
-            elif switch == 0:
-                match = wvrhis.search(line)
-                if match:
-                    switch = 1
+    for line in source:
+        # check for pickup song match
+        if wvrpkp.search(line):
+            match = wvrpkp.search(line)
+            song_ranks['pkp'] = match.group(1)
+        # check for ed song match
+        elif wvred.search(line):
+            match = wvred.search(line)
+            song_ranks['ed'] = match.group(1)
+        # scan line for song
+        elif wvr.search(line):
+            match = wvr.search(line)
+            a = match.group(1)
+            # history
+            if switch == 1:
+                # line is in history section, prepend number with 'h'.  If
+                # it's the last song (#1), go back to regular ranking
+                if a == "1":
+                    switch = 2
+                a = 'h' + a
+            song_ranks[a] = match.group(2)
+        # check for start of history section
+        elif switch == 0:
+            match = wvrhis.search(line)
+            if match:
+                switch = 1
     return song_ranks
 
 def checklinks(song_ranks):
