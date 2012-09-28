@@ -33,7 +33,8 @@ def translate_main(week, source):
         print('Using {} as src'.format(source))
         src = source
     print('parsing src...')
-    ranks = parse.parse_vocaloidism(src)
+    with open(src) as source:
+        ranks = parse.parse_vocaloidism(source)
     print('checking parsed links...')
     if parse.checklinks(ranks):
         raise FileFormatError('parse_vocaloidism links is incomplete.  ' + 
