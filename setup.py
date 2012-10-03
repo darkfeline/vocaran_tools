@@ -43,9 +43,9 @@ def rget_packages(start, dir, l):
         rget_packages(start, os.path.join(dir, x), l)
 
 setup(
-    name='vocatools',
+    name='vocaran_tools',
     version='2.0',
-    description='Vocaloid dl tools',
+    description='Vocaloid song dl tools',
     author='Allen Li',
     author_email='darkfeline@abagofapples.com',
     package_dir={'': 'src'},
