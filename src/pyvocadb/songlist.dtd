@@ -1,0 +1,14 @@
+<!DOCTYPE songlist [
+<!ELEMENT songlist (song*)>
+
+<!ELEMENT song (name, vocalists, producers, type, albums, tags, original_media,
+    other_media)>
+<!ELEMENT name (#PCDATA)>
+<!ELEMENT vocalists (#PCDATA)>
+<!ELEMENT producers (#PCDATA)>
+<!ELEMENT type (#PCDATA)>
+<!ELEMENT albums (#PCDATA)>
+<!ELEMENT tags (#PCDATA)>
+<!ELEMENT original_media (#PCDATA)>
+<!ELEMENT other_media (#PCDATA)>
+]>

@@ -1,0 +1,19 @@
+<!DOCTYPE albumlist [
+    <!ELEMENT albumlist (album*)>
+
+
+    <!ELEMENT album (name, vocalists, producers, other_artists, type, albums,
+                     tags, songlist)>
+
+    <!ELEMENT name (#PCDATA)>
+    <!ELEMENT vocalists (#PCDATA)>
+    <!ELEMENT producers (#PCDATA)>
+    <!ELEMENT other_artists (#PCDATA)>
+    <!ELEMENT type (#PCDATA)>
+    <!ELEMENT albums (#PCDATA)>
+    <!ELEMENT tags (#PCDATA)>
+
+    <!ENTITY % songlist SYSTEM "songlist.dtd">
+    %songlist;
+
+]>

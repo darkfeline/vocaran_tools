@@ -1,16 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE list [
-    <!ELEMENT list (song)>
-        <!ELEMENT song (name, vocalists, producers, type, albums, tags)>
-            <!ELEMENT name (#PCDATA)>
-            <!ELEMENT vocalists (#PCDATA)>
-            <!ELEMENT producers (#PCDATA)>
-            <!ELEMENT type (#PCDATA)>
-            <!ELEMENT albums (#PCDATA)>
-            <!ELEMENT tags (#PCDATA)>
-]>
 
-<list>
+<!DOCTYPE songlist SYSTEM "songlist.dtd">
+
+<songlist>
     <song>
         <name>from Y to Y</name>
         <vocalists>初音ミク, 巡音ルカ</vocalists>
@@ -18,5 +10,7 @@
         <type>Original song</type>
         <albums>EXIT TUNES PRESENTS Vocalostar feat. 初音ミク, illune, MOER feat. 初音ミク -2nd anniversary-, RAINBOW SNOW ～オーロラにえがいたLoveLetter～, Toy Box, 初音ミクベスト ～memories～</albums>
         <tags></tags>
+        <original_media>http://.../sm...</original_media>
+        <other_media>http://.../sm...</other_media>
     </song>
-</list>
+</songlist>
