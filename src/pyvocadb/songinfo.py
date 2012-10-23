@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 from lxml import etree
 
 def parse_song_info(xml):

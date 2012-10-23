@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 class ExitException(Exception):
 
     """Used to raise sys.exit()"""
