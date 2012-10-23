@@ -9,17 +9,13 @@ SongList file format
 ::
 
     file ::= header song_entry* stop
-    header ::= week_number [is_done]
-
-    week_number ::= '% ' ('0' ... '9')+ ' \\n'
+    header ::= [is_done]
     is_done ::= '% done \\n'
-    entry_start ::= '% start_entry \\n'
     stop ::= '% end \\n'
 
     song_entry ::= entry_start id name artist album comment apic
-    nndid ::= ('s' | 'n') ('m' | 'o') ('0' ... '9')+ '\\n'
-    rank ::= (['h'] ('0' .. '9')+ | 'pkp' | 'ed') '\\n'
-    id ::= (nndid | rank) '\\n'
+    entry_start ::= '% start_entry \\n'
+    id ::= ('s' | 'n') ('m' | 'o') ('0' ... '9')+ '\\n'
     name ::= <any string that doesn't contain '\\n'>
     artist ::= <any string that doesn't contain '\\n'>
     album ::= <any string that doesn't contain '\\n'>
@@ -34,14 +30,14 @@ import os
 
 from vocaran_tools.errors import FileFormatError
 
+
 class SongEntry:
 
     _nnid = re.compile(r'^[sn][mo][0-9]+$', re.I)
     _save = ('id', 'name', 'artist', 'album', 'comment', 'apic')
 
     def __init__(self, id='sm1', name='', artist='', album='', comment='',
-            apic='none'):
-        self.values = {}
+                 apic='none'):
         self.id = id
         self.name = name
         self.artist = artist
@@ -65,72 +61,13 @@ class SongEntry:
 
     @property
     def id(self):
-        return self.values['id']
+        return self._id
 
     @id.setter
     def id(self, value):
-        if not self.__class__._nnid.match(value):
+        if not self._nnid.match(value):
             raise TypeError('"value" must be a valid NNID string.')
-        self.values['id'] = value
-
-    @property
-    def name(self):
-        return self.values['name']
-
-    @name.setter
-    def name(self, value):
-        self.values['name'] = value
-
-    @property
-    def artist(self):
-        return self.values['artist']
-
-    @artist.setter
-    def artist(self, value):
-        self.values['artist'] = value
-
-    @property
-    def album(self):
-        return self.values['album']
-
-    @album.setter
-    def album(self, value):
-        self.values['album'] = value
-
-    @property
-    def comment(self):
-        return self.values['comment']
-
-    @comment.setter
-    def comment(self, value):
-        self.values['comment'] = value
-
-    @property
-    def apic(self):
-        return self.values['apic']
-
-    @apic.setter
-    def apic(self, value):
-        self.values['apic'] = value
-
-
-class RankedSongEntry(SongEntry):
-
-    _rank = re.compile(r'^h?[0-9]+|ed|pkp$', re.I)
-
-    @property
-    def id(self):
-        return super().id
-
-    @id.setter
-    def id(self, value):
-        if self._rank.match(value):
-            self.values['id'] = value
-        else:
-            try:
-                super(RankedSongEntry, self.__class__).id.fset(self, value)
-            except TypeError:
-                raise TypeError('"value" must be a valid NNID string or rank.')
+        self._id = value
 
 
 class SongList:
@@ -139,23 +76,15 @@ class SongList:
     _special_str = '% {} \n'
     _special_re = re.compile(r'^% (\w+)')
 
-    def __init__(self, file='', week='0'):
-        self.week = week
-        self.entries = []
+    def __init__(self, file):
+
         self.file = file
+
+        self.entries = []
         self.done = False
-
-    @property
-    def week(self):
-        return self._week
-
-    @week.setter
-    def week(self, value):
-        self._week = int(value)
 
     def save(self):
         with open(self.file + '~', 'w') as f:
-            f.write(self._special_str.format(str(self.week)))
             if self.done:
                 f.write(self._special_str.format('done'))
             for entry in self.entries:
@@ -168,12 +97,8 @@ class SongList:
     def load(cls, file):
         slist = cls(file)
         with open(file, 'r') as f:
-            s = f.readline().rstrip()
-            m = cls._special_re.match(s)
-            slist.week = m.group(1)
-            while True:
-                s = f.readline().rstrip()
-                m = cls._special_re.match(s)
+            for line in f.readline():
+                m = cls._special_re.match(f)
                 if m.group(1) == 'end':
                     break
                 elif m.group(1) == 'start_entry':
@@ -185,7 +110,7 @@ class SongList:
         return slist
 
     def add(self, *args, **kwargs):
-        entry = self.__class__.entry_type
+        entry = self.entry_type
         if len(args) >= 1 and isinstance(args[0], entry):
             self.entries.append(args[0])
         else:
@@ -195,10 +120,10 @@ class SongList:
         return self.entries[key]
 
     def __setitem__(self, key, value):
-        entry = self.__class__.entry_type
+        entry = self.entry_type
         if not isinstance(value, entry):
             raise TypeError('"value" must be an instance of {}.'.format(
-                                                                 str(entry)))
+                str(entry)))
         self.entries[key] = value
 
     def __delitem__(self, key):
@@ -209,8 +134,3 @@ class SongList:
 
     def __len__(self):
         return len(self.entries)
-
-
-class RankedSongList(SongList):
-
-    entry_type = RankedSongEntry
