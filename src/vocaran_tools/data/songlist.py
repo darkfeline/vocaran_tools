@@ -83,6 +83,10 @@ class SongList:
         self.entries = []
         self.done = False
 
+    @property
+    def name(self):
+        return os.path.basename(self.file)
+
     def save(self):
         with open(self.file + '~', 'w') as f:
             if self.done:
