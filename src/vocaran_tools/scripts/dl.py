@@ -13,20 +13,22 @@ from vocaran_tools.errors import StructureError
 from vocaran_tools import dl
 from vocaran_tools.data import dm, songlist
 
+
 def load_session(sessionfile, filename):
     """Return the index from session file after checking md5sum.
-    
+
     If the md5sum doesn't match, return -1.
-    
+
     """
     with open(sessionfile) as f:
         hash = f.readline().rstrip()
         i = int(f.readline().rstrip())
     with open(filename) as g:
-        if (hashlib.sha256(''.join(g.readlines()).rstrip().encode('UTF-8')
-            ).hexdigest() == hash):
+        if (hashlib.sha256(''.join(g.readlines()).rstrip().encode(
+                'UTF-8')).hexdigest() == hash):
             return i
     return -1
+
 
 def save_session(sessionfile, filename, i):
     """Save index to sessionfile with md5sum of song list file."""
@@ -37,21 +39,24 @@ def save_session(sessionfile, filename, i):
             f.write('\n')
             f.write(str(i))
 
+
 def main(*args):
 
     import argparse
 
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('-f', dest='force', action='store_true', default=False)
-    parser.add_argument('-m', '--method', dest='method', action='store',
-            choices=('dl_nicomimi', 'dl_nicosound_selenium',
-                'dl_nicosound_spynner'), default='dl_nicosound_spynner')
-    parser.add_argument('week', type=int)
+    parser.add_argument(
+        '-m', '--method', dest='method', action='store',
+        choices=('dl_nicosound_selenium', 'dl_nicosound_spynner'),
+        default='dl_nicosound_spynner')
+    parser.add_argument('name', type=int)
     args = parser.parse_args(args)
 
-    dlmain(args.week, dl.__dict__[args.method], args.force)
+    dlmain(args.name, dl.__dict__[args.method], args.force)
 
-def dlmain(week, dlf, *args):
+
+def dlmain(name, dlf, *args):
 
     """Parse song list file and pass on to dlloop
 
@@ -66,10 +71,7 @@ def dlmain(week, dlf, *args):
     """
 
     print('Loading song list...')
-    slist = dm.get_songlist(week)
-    if isinstance(slist, songlist.RankedSongList):
-        print('Translate song list first')
-        raise ExitException(1)
+    slist = dm.get_songlist(name)
     # personal defaults here
     for entry in slist:
         if entry.comment == '':
@@ -77,11 +79,12 @@ def dlmain(week, dlf, *args):
         if entry.apic == '':
             entry.apic = 'smile'
     print('Downloading...')
-    dlloop(dlf, slist, dm.get_songlist_path(week), *args)
+    dlloop(dlf, slist, dm.get_songlist_path(name), *args)
     print('Marking song list as done...')
     slist.done = True
     slist.save()
     print('Done.')
+
 
 def dlloop(dlf, slist, path, force=False):
 
@@ -107,7 +110,7 @@ def dlloop(dlf, slist, path, force=False):
     except StructureError:
         rejects = dm.make_songlist(0)
 
-    sessionfile= dm.SESSION_FILE
+    sessionfile = dm.SESSION_FILE
     # load session
     if os.path.isfile(sessionfile):
         print('Loading last session...')
@@ -143,7 +146,7 @@ def dlloop(dlf, slist, path, force=False):
                         raise ExitException(1)
             except FileNotAvailableError:
                 print('File not available; adding to rejects...')
-                if slist.week != 0:
+                if slist.name != 0:
                     rejects.add(entry)
                 break
             else:
