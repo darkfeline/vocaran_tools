@@ -21,10 +21,3 @@ class SongInfo:
         self.type = ''
         self.albums = ''
         self.tags = ''
-
-if __name__=="__main__":
-    root = parse_song_info('test.xml')
-    for song in root:
-        print(song.name)
-        print(song.vocalists)
-        print(song.producers)
