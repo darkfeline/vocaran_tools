@@ -5,10 +5,9 @@ vct
 
 USAGE
 
-vct add
+vct touch
 vct dl
 vct show
-vct tl
 vct move
 vct rm
 
@@ -19,29 +18,26 @@ vocaran_tools.scripts.  See respective modules for details.
 
 import sys
 
-from vocaran_tools.scripts import add
+from vocaran_tools.scripts import touch
 from vocaran_tools.scripts import dl
 from vocaran_tools.scripts import show
-from vocaran_tools.scripts import translate
 from vocaran_tools.scripts import move_songs
 from vocaran_tools.scripts import remove
 from vocaran_tools.errors import ExitException
 
+
 def main(*args):
     if len(args) < 1:
         print(__doc__)
-    elif args[0] == 'add':
-        sys.argv[0] = 'vct add'
-        add.main(*args[1:])
+    elif args[0] == 'touch':
+        sys.argv[0] = 'vct touch'
+        touch.main(*args[1:])
     elif args[0] == 'dl':
         sys.argv[0] = 'vct dl'
         dl.main(*args[1:])
     elif args[0] == 'show':
         sys.argv[0] = 'vct show'
         show.main(*args[1:])
-    elif args[0] == 'tl':
-        sys.argv[0] = 'vct tl'
-        translate.main(*args[1:])
     elif args[0] == 'rm':
         sys.argv[0] = 'vct rm'
         remove.main(*args[1:])
