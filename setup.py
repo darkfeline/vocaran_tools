@@ -14,7 +14,7 @@ def get_resources(dir):
 
 def make_listing(dir):
     return (dir, [os.path.join(dir, x) for x in os.listdir(dir) if
-        os.path.isfile(os.path.join(dir, x))])
+                  os.path.isfile(os.path.join(dir, x))])
 
 
 def rget_resources(dir, l):
@@ -51,5 +51,5 @@ setup(
     package_dir={'': 'src'},
     py_modules=get_modules('src'),
     packages=get_packages('src'),
-    scripts=['vct']
+    scripts=['src/vct']
 )
